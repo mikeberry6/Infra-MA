@@ -1,0 +1,73 @@
+{{ define "main" }}
+{{/* Reading progress bar */}}
+<div class="reading-progress" id="reading-progress"></div>
+
+<article class="analysis-article">
+  <header class="analysis-article__header">
+    <span class="analysis-card__category">{{ .Params.category | default "Analysis" }}</span>
+    <h1 class="analysis-article__title">{{ .Title }}</h1>
+    <div class="analysis-article__meta">
+      <div class="analysis-article__author">
+        <span class="analysis-article__avatar" aria-hidden="true">{{ with .Params.author }}{{ substr . 0 1 }}{{ end }}</span>
+        <div>
+          <span class="analysis-article__author-name">{{ .Params.author | default "Editorial Team" }}</span>
+          <span class="analysis-article__date">{{ .Date.Format "January 2, 2006" }} &middot; {{ math.Round (div (countwords .Content) 200.0) }} min read</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="analysis-article__content">
+    {{ .Content }}
+  </div>
+
+  {{ with .Params.tags }}
+  <div class="analysis-article__tags">
+    {{ range . }}
+    <a href="{{ "tags/" | relURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
+    {{ end }}
+  </div>
+  {{ end }}
+
+  {{/* Author bio */}}
+  <div class="analysis-article__bio">
+    <span class="analysis-article__avatar analysis-article__avatar--lg" aria-hidden="true">{{ with .Params.author }}{{ substr . 0 1 }}{{ end }}</span>
+    <div>
+      <strong>{{ .Params.author | default "Editorial Team" }}</strong>
+      <p>Infrastructure M&amp;A research and analysis covering global transactions, sector trends, and market insights.</p>
+    </div>
+  </div>
+
+  {{/* Related articles */}}
+  {{ $currentPage := . }}
+  {{ $related := where (where .Site.RegularPages "Section" "analysis") ".Permalink" "!=" .Permalink }}
+  {{ if $related }}
+  <div class="analysis-article__related">
+    <h3>Related Articles</h3>
+    <div class="analysis-grid">
+      {{ range first 2 $related }}
+      <a href="{{ .RelPermalink }}" class="analysis-card">
+        <span class="analysis-card__category">{{ .Params.category | default "Analysis" }}</span>
+        <h4 class="analysis-card__title">{{ .Title }}</h4>
+        <div class="analysis-card__meta">
+          <span>{{ .Date.Format "Jan 2, 2006" }}</span>
+        </div>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+  {{ end }}
+</article>
+
+<script>
+(function(){
+  var bar = document.getElementById('reading-progress');
+  if (!bar) return;
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement;
+    var pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    bar.style.width = Math.min(pct, 100) + '%';
+  });
+})();
+</script>
+{{ end }}

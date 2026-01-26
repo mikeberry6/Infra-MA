@@ -1,5 +1,40 @@
 <footer class="site-footer">
-  <div class="container">
-    <p>&copy; {{ now.Year }} {{ .Site.Title }}. All rights reserved.</p>
+  <div class="footer-main container">
+    <div class="footer-col footer-col--brand">
+      <a href="{{ "/" | relURL }}" class="footer-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        {{ .Site.Title }}
+      </a>
+      <p class="footer-tagline">{{ .Site.Params.tagline }}</p>
+    </div>
+    <div class="footer-col">
+      <h4 class="footer-heading">Quick Links</h4>
+      <ul class="footer-list">
+        {{ range .Site.Menus.main }}
+        <li><a href="{{ .URL | relURL }}">{{ .Name }}</a></li>
+        {{ end }}
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 class="footer-heading">Resources</h4>
+      <ul class="footer-list">
+        <li><a href="{{ "sectors/" | relURL }}">Sector Coverage</a></li>
+        <li><a href="{{ "analysis/" | relURL }}">Market Analysis</a></li>
+        <li><a href="{{ "about/" | relURL }}">About Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 class="footer-heading">Stay Updated</h4>
+      <p class="footer-text">Get the latest infrastructure M&amp;A insights delivered to your inbox.</p>
+      <form class="footer-newsletter" onsubmit="return false;">
+        <input type="email" placeholder="Email address" class="footer-input" aria-label="Email address">
+        <button type="submit" class="footer-btn" aria-label="Subscribe">Subscribe</button>
+      </form>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <p>&copy; {{ now.Year }} {{ .Site.Title }}. All rights reserved.</p>
+    </div>
   </div>
 </footer>

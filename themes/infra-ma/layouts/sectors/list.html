@@ -1,0 +1,24 @@
+{{ define "main" }}
+<h1 class="section__title">Sectors</h1>
+<p class="section__subtitle">Infrastructure M&amp;A activity across key sectors.</p>
+
+<div class="sector-grid">
+  {{ $sectorNames := dict "energy" "Energy" "transport" "Transport" "digital" "Digital Infrastructure" "water" "Water &amp; Utilities" "social" "Social Infrastructure" }}
+  {{ $sectorDescs := dict "energy" "Power generation, transmission, renewables, and energy transition" "transport" "Airports, ports, toll roads, rail, and logistics" "digital" "Data centers, fiber networks, telecom towers, and edge computing" "water" "Water treatment, distribution, and waste management" "social" "Hospitals, schools, government buildings, and public services" }}
+  {{ range $key, $name := $sectorNames }}
+  {{ $count := 0 }}
+  {{ $totalValue := "" }}
+  {{ range (where $.Site.RegularPages "Section" "deals") }}
+    {{ if eq .Params.sector $key }}{{ $count = add $count 1 }}{{ end }}
+  {{ end }}
+  <a href="{{ "sectors/" | relURL }}{{ $key }}/" class="sector-card sector-card--{{ $key }}">
+    <div class="sector-card__header">
+      <span class="sector-card__name">{{ $name }}</span>
+      <span class="sector-card__count">{{ $count }} {{ if eq $count 1 }}deal{{ else }}deals{{ end }}</span>
+    </div>
+    <p class="sector-card__desc">{{ index $sectorDescs $key }}</p>
+    <span class="sector-card__link">View deals &rarr;</span>
+  </a>
+  {{ end }}
+</div>
+{{ end }}

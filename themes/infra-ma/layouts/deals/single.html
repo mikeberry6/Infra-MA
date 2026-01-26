@@ -1,92 +1,61 @@
 {{ define "main" }}
 <article class="deal-profile">
 
-  {{/* ── Header banner ── */}}
+  {{/* Back link */}}
+  <a href="{{ "deals/" | relURL }}" class="deal-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    Back to Deals
+  </a>
+
+  {{/* Header banner */}}
   <header class="deal-header">
     <div class="deal-header-top">
       <div>
+        <div class="deal-header-badges">
+          <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
+            <span class="deal-card__status-dot"></span>
+            {{ .Params.status | default "Announced" }}
+          </span>
+          {{ with .Params.sector }}
+          <span class="sector-badge sector-badge--{{ urlize . }}">{{ . }}</span>
+          {{ end }}
+        </div>
         <h1 class="deal-title">{{ .Title }}</h1>
         <p class="deal-subtitle">
           {{ with .Params.buyer }}{{ . }}{{ end }}
-          {{ if and .Params.buyer .Params.asset }}&rarr;{{ end }}
+          {{ if and .Params.buyer .Params.asset }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin: 0 0.25rem;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          {{ end }}
           {{ with .Params.asset }}{{ . }}{{ end }}
         </p>
       </div>
-      <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
-        {{ .Params.status | default "Announced" }}
-      </span>
+      {{ with .Params.deal_value }}
+      <div class="deal-header-value">
+        <span class="deal-header-value__label">Deal Value</span>
+        <span class="deal-header-value__amount">{{ . }}</span>
+      </div>
+      {{ end }}
     </div>
     <div class="deal-header-meta">
       <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
-      {{ with .Params.sector }}
-      <span class="deal-sector">{{ . }}</span>
-      {{ end }}
       {{ with .Params.geography }}
-      <span class="deal-geography">{{ . }}</span>
+      <span>{{ . }}</span>
       {{ end }}
     </div>
   </header>
 
   <div class="deal-body">
 
-    {{/* ── Sidebar: key facts ── */}}
-    <aside class="deal-sidebar">
-      <div class="deal-factcard">
-        <h2 class="deal-factcard-heading">Deal Details</h2>
-        <dl class="deal-facts">
-          {{ with .Params.deal_value }}
-          <div class="deal-fact">
-            <dt>Deal Value</dt>
-            <dd class="deal-fact--value">{{ . }}</dd>
-          </div>
-          {{ end }}
-
-          <div class="deal-fact">
-            <dt>Status</dt>
-            <dd>
-              <span class="deal-status-dot deal-status-dot--{{ urlize (.Params.status | default "announced") }}"></span>
-              {{ .Params.status | default "Announced" }}
-            </dd>
-          </div>
-
-          {{ with .Params.sector }}
-          <div class="deal-fact">
-            <dt>Sector</dt>
-            <dd>{{ . }}</dd>
-          </div>
-          {{ end }}
-
-          {{ with .Params.geography }}
-          <div class="deal-fact">
-            <dt>Geography</dt>
-            <dd>{{ . }}</dd>
-          </div>
-          {{ end }}
-
-          <div class="deal-fact">
-            <dt>Announced</dt>
-            <dd>{{ .Date.Format "Jan 2, 2006" }}</dd>
-          </div>
-
-          {{ with .Params.source_url }}
-          <div class="deal-fact">
-            <dt>Source</dt>
-            <dd><a href="{{ . }}" target="_blank" rel="noopener">View source &nearr;</a></dd>
-          </div>
-          {{ end }}
-        </dl>
-      </div>
-    </aside>
-
-    {{/* ── Main content column ── */}}
+    {{/* Main content column */}}
     <div class="deal-main">
 
-      {{/* Parties cards */}}
+      {{/* Parties */}}
       <section class="deal-section">
         <h2 class="deal-section-heading">Parties</h2>
         <div class="deal-parties">
           {{ if or .Params.buyer .Params.buyer_description }}
           <div class="deal-party-card">
+            <div class="deal-party-avatar" aria-hidden="true">{{ with .Params.buyer }}{{ substr . 0 1 }}{{ end }}</div>
             <span class="deal-party-role">Buyer</span>
             <h3 class="deal-party-name">{{ .Params.buyer | default "TBD" }}</h3>
             {{ with .Params.buyer_description }}
@@ -95,8 +64,15 @@
           </div>
           {{ end }}
 
+          {{ if and .Params.buyer .Params.seller }}
+          <div class="deal-parties-arrow" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+          {{ end }}
+
           {{ if or .Params.seller .Params.seller_description }}
           <div class="deal-party-card">
+            <div class="deal-party-avatar" aria-hidden="true">{{ with .Params.seller }}{{ substr . 0 1 }}{{ end }}</div>
             <span class="deal-party-role">Seller</span>
             <h3 class="deal-party-name">{{ .Params.seller | default "TBD" }}</h3>
             {{ with .Params.seller_description }}
@@ -107,7 +83,7 @@
         </div>
       </section>
 
-      {{/* Asset card */}}
+      {{/* Asset */}}
       {{ if or .Params.asset .Params.asset_description }}
       <section class="deal-section">
         <h2 class="deal-section-heading">Asset</h2>
@@ -120,7 +96,7 @@
       </section>
       {{ end }}
 
-      {{/* Free-form body content */}}
+      {{/* Body content */}}
       {{ if .Content }}
       <section class="deal-section">
         <h2 class="deal-section-heading">Overview</h2>
@@ -129,8 +105,75 @@
         </div>
       </section>
       {{ end }}
+    </div>
 
-    </div>{{/* /.deal-main */}}
-  </div>{{/* /.deal-body */}}
+    {{/* Sidebar */}}
+    <aside class="deal-sidebar">
+      <div class="deal-factcard">
+        <h2 class="deal-factcard-heading">Quick Facts</h2>
+        <dl class="deal-facts">
+          {{ with .Params.deal_value }}
+          <div class="deal-fact">
+            <dt>Deal Value</dt>
+            <dd class="deal-fact--value">{{ . }}</dd>
+          </div>
+          {{ end }}
+          <div class="deal-fact">
+            <dt>Status</dt>
+            <dd>
+              <span class="deal-status-dot deal-status-dot--{{ urlize (.Params.status | default "announced") }}"></span>
+              {{ .Params.status | default "Announced" }}
+            </dd>
+          </div>
+          {{ with .Params.sector }}
+          <div class="deal-fact">
+            <dt>Sector</dt>
+            <dd><span class="sector-badge sector-badge--{{ urlize . }}">{{ . }}</span></dd>
+          </div>
+          {{ end }}
+          {{ with .Params.geography }}
+          <div class="deal-fact">
+            <dt>Geography</dt>
+            <dd>{{ . }}</dd>
+          </div>
+          {{ end }}
+          <div class="deal-fact">
+            <dt>Announced</dt>
+            <dd>{{ .Date.Format "Jan 2, 2006" }}</dd>
+          </div>
+          {{ with .Params.source_url }}
+          <div class="deal-fact">
+            <dt>Source</dt>
+            <dd><a href="{{ . }}" target="_blank" rel="noopener">View source &nearr;</a></dd>
+          </div>
+          {{ end }}
+        </dl>
+      </div>
+
+      {{/* Related deals */}}
+      {{ $currentSector := .Params.sector }}
+      {{ $currentPage := . }}
+      {{ $related := slice }}
+      {{ range (where (where $.Site.RegularPages "Section" "deals") ".Params.sector" $currentSector) }}
+        {{ if ne .Permalink $currentPage.Permalink }}
+          {{ $related = $related | append . }}
+        {{ end }}
+      {{ end }}
+      {{ if $related }}
+      <div class="deal-factcard deal-related">
+        <h2 class="deal-factcard-heading">Related Deals</h2>
+        {{ range first 3 $related }}
+        <a href="{{ .RelPermalink }}" class="deal-related-card">
+          <span class="deal-related-card__title">{{ .Title }}</span>
+          <span class="deal-related-card__meta">
+            {{ with .Params.deal_value }}{{ . }} &middot; {{ end }}{{ .Date.Format "Jan 2006" }}
+          </span>
+        </a>
+        {{ end }}
+      </div>
+      {{ end }}
+    </aside>
+
+  </div>
 </article>
 {{ end }}

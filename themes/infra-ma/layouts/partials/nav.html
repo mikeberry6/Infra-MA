@@ -1,0 +1,29 @@
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header class="site-nav-wrap" id="site-nav">
+  <div class="nav-inner container">
+    <a href="{{ "/" | relURL }}" class="nav-logo" aria-label="Home">
+      <svg class="nav-logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+      <span>{{ .Site.Title }}</span>
+    </a>
+    <nav class="nav-links" id="nav-links" aria-label="Main navigation">
+      {{ range .Site.Menus.main }}
+      <a href="{{ .URL | relURL }}" class="nav-link{{ if $.IsMenuCurrent "main" . }} nav-link--active{{ end }}">{{ .Name }}</a>
+      {{ end }}
+    </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </button>
+  </div>
+</header>
+<script>
+(function(){
+  var btn=document.getElementById('nav-toggle'),nav=document.getElementById('nav-links');
+  btn.addEventListener('click',function(){
+    var open=nav.classList.toggle('nav-links--open');
+    btn.classList.toggle('nav-toggle--open',open);
+    btn.setAttribute('aria-expanded',open);
+  });
+})();
+</script>
