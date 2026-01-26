@@ -18,18 +18,22 @@ theme = 'infra-ma'
     url = '/'
     weight = 1
   [[menu.main]]
+    name = 'Deals'
+    url = '/deals/'
+    weight = 2
+  [[menu.main]]
     name = 'Transactions'
     url = '/transactions/'
-    weight = 2
+    weight = 3
   [[menu.main]]
     name = 'Sectors'
     url = '/sectors/'
-    weight = 3
+    weight = 4
   [[menu.main]]
     name = 'Analysis'
     url = '/analysis/'
-    weight = 4
+    weight = 5
   [[menu.main]]
     name = 'About'
     url = '/about/'
-    weight = 5
+    weight = 6

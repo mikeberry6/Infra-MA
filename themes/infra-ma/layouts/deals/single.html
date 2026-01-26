@@ -1,0 +1,136 @@
+{{ define "main" }}
+<article class="deal-profile">
+
+  {{/* ── Header banner ── */}}
+  <header class="deal-header">
+    <div class="deal-header-top">
+      <div>
+        <h1 class="deal-title">{{ .Title }}</h1>
+        <p class="deal-subtitle">
+          {{ with .Params.buyer }}{{ . }}{{ end }}
+          {{ if and .Params.buyer .Params.asset }}&rarr;{{ end }}
+          {{ with .Params.asset }}{{ . }}{{ end }}
+        </p>
+      </div>
+      <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
+        {{ .Params.status | default "Announced" }}
+      </span>
+    </div>
+    <div class="deal-header-meta">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+      {{ with .Params.sector }}
+      <span class="deal-sector">{{ . }}</span>
+      {{ end }}
+      {{ with .Params.geography }}
+      <span class="deal-geography">{{ . }}</span>
+      {{ end }}
+    </div>
+  </header>
+
+  <div class="deal-body">
+
+    {{/* ── Sidebar: key facts ── */}}
+    <aside class="deal-sidebar">
+      <div class="deal-factcard">
+        <h2 class="deal-factcard-heading">Deal Details</h2>
+        <dl class="deal-facts">
+          {{ with .Params.deal_value }}
+          <div class="deal-fact">
+            <dt>Deal Value</dt>
+            <dd class="deal-fact--value">{{ . }}</dd>
+          </div>
+          {{ end }}
+
+          <div class="deal-fact">
+            <dt>Status</dt>
+            <dd>
+              <span class="deal-status-dot deal-status-dot--{{ urlize (.Params.status | default "announced") }}"></span>
+              {{ .Params.status | default "Announced" }}
+            </dd>
+          </div>
+
+          {{ with .Params.sector }}
+          <div class="deal-fact">
+            <dt>Sector</dt>
+            <dd>{{ . }}</dd>
+          </div>
+          {{ end }}
+
+          {{ with .Params.geography }}
+          <div class="deal-fact">
+            <dt>Geography</dt>
+            <dd>{{ . }}</dd>
+          </div>
+          {{ end }}
+
+          <div class="deal-fact">
+            <dt>Announced</dt>
+            <dd>{{ .Date.Format "Jan 2, 2006" }}</dd>
+          </div>
+
+          {{ with .Params.source_url }}
+          <div class="deal-fact">
+            <dt>Source</dt>
+            <dd><a href="{{ . }}" target="_blank" rel="noopener">View source &nearr;</a></dd>
+          </div>
+          {{ end }}
+        </dl>
+      </div>
+    </aside>
+
+    {{/* ── Main content column ── */}}
+    <div class="deal-main">
+
+      {{/* Parties cards */}}
+      <section class="deal-section">
+        <h2 class="deal-section-heading">Parties</h2>
+        <div class="deal-parties">
+          {{ if or .Params.buyer .Params.buyer_description }}
+          <div class="deal-party-card">
+            <span class="deal-party-role">Buyer</span>
+            <h3 class="deal-party-name">{{ .Params.buyer | default "TBD" }}</h3>
+            {{ with .Params.buyer_description }}
+            <p class="deal-party-desc">{{ . }}</p>
+            {{ end }}
+          </div>
+          {{ end }}
+
+          {{ if or .Params.seller .Params.seller_description }}
+          <div class="deal-party-card">
+            <span class="deal-party-role">Seller</span>
+            <h3 class="deal-party-name">{{ .Params.seller | default "TBD" }}</h3>
+            {{ with .Params.seller_description }}
+            <p class="deal-party-desc">{{ . }}</p>
+            {{ end }}
+          </div>
+          {{ end }}
+        </div>
+      </section>
+
+      {{/* Asset card */}}
+      {{ if or .Params.asset .Params.asset_description }}
+      <section class="deal-section">
+        <h2 class="deal-section-heading">Asset</h2>
+        <div class="deal-asset-card">
+          <h3 class="deal-asset-name">{{ .Params.asset | default "TBD" }}</h3>
+          {{ with .Params.asset_description }}
+          <p class="deal-asset-desc">{{ . }}</p>
+          {{ end }}
+        </div>
+      </section>
+      {{ end }}
+
+      {{/* Free-form body content */}}
+      {{ if .Content }}
+      <section class="deal-section">
+        <h2 class="deal-section-heading">Overview</h2>
+        <div class="deal-content">
+          {{ .Content }}
+        </div>
+      </section>
+      {{ end }}
+
+    </div>{{/* /.deal-main */}}
+  </div>{{/* /.deal-body */}}
+</article>
+{{ end }}

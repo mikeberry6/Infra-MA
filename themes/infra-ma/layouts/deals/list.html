@@ -1,0 +1,34 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+{{ .Content }}
+
+<div class="deal-list-grid">
+  {{ range .Pages.ByDate.Reverse }}
+  <a href="{{ .RelPermalink }}" class="deal-list-card">
+    <div class="deal-list-card-header">
+      <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
+        {{ .Params.status | default "Announced" }}
+      </span>
+      {{ with .Params.deal_value }}
+      <span class="deal-list-value">{{ . }}</span>
+      {{ end }}
+    </div>
+    <h3 class="deal-list-card-title">{{ .Title }}</h3>
+    <div class="deal-list-card-parties">
+      {{ with .Params.buyer }}<span class="deal-list-party"><strong>Buyer:</strong> {{ . }}</span>{{ end }}
+      {{ with .Params.seller }}<span class="deal-list-party"><strong>Seller:</strong> {{ . }}</span>{{ end }}
+    </div>
+    {{ with .Params.asset }}
+    <div class="deal-list-card-asset"><strong>Asset:</strong> {{ . }}</div>
+    {{ end }}
+    <div class="deal-list-card-footer">
+      {{ with .Params.sector }}<span class="deal-list-tag">{{ . }}</span>{{ end }}
+      {{ with .Params.geography }}<span class="deal-list-tag">{{ . }}</span>{{ end }}
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+    </div>
+  </a>
+  {{ else }}
+  <p>No deals recorded yet.</p>
+  {{ end }}
+</div>
+{{ end }}
