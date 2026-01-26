@@ -1,0 +1,34 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+{{ .Content }}
+
+{{ if eq .Section "transactions" }}
+<div class="transaction-grid">
+  {{ range .Pages.ByDate.Reverse }}
+  <div class="transaction-card">
+    <div class="transaction-status status-{{ urlize (.Params.status | default "pending") }}">
+      {{ .Params.status | default "Pending" }}
+    </div>
+    <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+    <div class="transaction-meta">
+      {{ with .Params.acquirer }}<span class="meta-item"><strong>Acquirer:</strong> {{ . }}</span>{{ end }}
+      {{ with .Params.target }}<span class="meta-item"><strong>Target:</strong> {{ . }}</span>{{ end }}
+      {{ with .Params.value }}<span class="meta-item"><strong>Value:</strong> {{ . }}</span>{{ end }}
+      {{ with .Params.sector }}<span class="meta-item"><strong>Sector:</strong> {{ . }}</span>{{ end }}
+    </div>
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+  </div>
+  {{ end }}
+</div>
+{{ else }}
+<ul class="content-list">
+  {{ range .Pages.ByDate.Reverse }}
+  <li>
+    <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+    {{ with .Summary }}<p>{{ . }}</p>{{ end }}
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+  </li>
+  {{ end }}
+</ul>
+{{ end }}
+{{ end }}

@@ -1,0 +1,46 @@
+{{ define "main" }}
+<section class="hero">
+  <h1>Infrastructure M&amp;A Tracker</h1>
+  <p>{{ .Site.Params.description }}</p>
+</section>
+
+<section class="recent-transactions">
+  <h2>Recent Transactions</h2>
+  <div class="transaction-grid">
+    {{ range first 6 (where .Site.RegularPages "Section" "transactions") }}
+    <div class="transaction-card">
+      <div class="transaction-status status-{{ urlize (.Params.status | default "pending") }}">
+        {{ .Params.status | default "Pending" }}
+      </div>
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      <div class="transaction-meta">
+        {{ with .Params.acquirer }}<span class="meta-item"><strong>Acquirer:</strong> {{ . }}</span>{{ end }}
+        {{ with .Params.target }}<span class="meta-item"><strong>Target:</strong> {{ . }}</span>{{ end }}
+        {{ with .Params.value }}<span class="meta-item"><strong>Value:</strong> {{ . }}</span>{{ end }}
+        {{ with .Params.sector }}<span class="meta-item"><strong>Sector:</strong> {{ . }}</span>{{ end }}
+      </div>
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+    </div>
+    {{ else }}
+    <p>No transactions recorded yet.</p>
+    {{ end }}
+  </div>
+  {{ if gt (len (where .Site.RegularPages "Section" "transactions")) 6 }}
+  <p class="view-all"><a href="{{ "transactions/" | relURL }}">View all transactions &rarr;</a></p>
+  {{ end }}
+</section>
+
+{{ with (where .Site.RegularPages "Section" "analysis") }}
+<section class="recent-analysis">
+  <h2>Latest Analysis</h2>
+  <ul class="analysis-list">
+    {{ range first 3 . }}
+    <li>
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+    </li>
+    {{ end }}
+  </ul>
+</section>
+{{ end }}
+{{ end }}
