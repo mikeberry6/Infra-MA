@@ -17,6 +17,10 @@ sector = 'digital'
 geography = 'North America'
 status = 'announced'
 source_url = ''
+summary = 'EQT acquires 12 hyperscale and colocation data centers from DigitalBridge, capitalizing on AI-driven demand for digital infrastructure.'
+date_added = 2024-08-01
+value_usd_billions = 6.8
+currency = 'USD'
 +++
 
 EQT has entered into a definitive agreement to acquire a portfolio of data center assets from DigitalBridge, marking one of the largest pure-play data center transactions in recent years.

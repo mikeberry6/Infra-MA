@@ -17,6 +17,10 @@ sector = 'energy'
 geography = 'Global'
 status = 'closed'
 source_url = 'https://www.blackrock.com'
+summary = 'BlackRock acquires Global Infrastructure Partners in the largest asset management deal in history, creating a $150B infrastructure platform.'
+date_added = 2024-06-15
+value_usd_billions = 12.5
+currency = 'USD'
 +++
 
 BlackRock's acquisition of Global Infrastructure Partners represents the largest deal in asset management history and marks a transformative expansion into infrastructure private markets.

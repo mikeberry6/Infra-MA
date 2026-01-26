@@ -9,11 +9,17 @@
     {{/* Stats row */}}
     {{ $deals := where .Site.RegularPages "Section" "deals" }}
     {{ $totalDeals := len $deals }}
+    {{ $totalValue := 0.0 }}
+    {{ range $deals }}{{ with .Params.value_usd_billions }}{{ $totalValue = add $totalValue . }}{{ end }}{{ end }}
     {{ $sectors := slice "energy" "transport" "digital" "water" "social" }}
     <div class="hero__stats">
       <div class="hero__stat glass-card">
         <span class="hero__stat-value" id="stat-deals">{{ $totalDeals }}</span>
         <span class="hero__stat-label">Deals Tracked</span>
+      </div>
+      <div class="hero__stat glass-card">
+        <span class="hero__stat-value">${{ lang.FormatNumberCustom 0 $totalValue }}B+</span>
+        <span class="hero__stat-label">Total Value</span>
       </div>
       <div class="hero__stat glass-card">
         <span class="hero__stat-value" id="stat-sectors">{{ len $sectors }}</span>
