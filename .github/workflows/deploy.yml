@@ -2,7 +2,7 @@ name: Deploy Hugo site to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/setup-hugo-infra-ma-gnqTl]
   workflow_dispatch:
 
 permissions:
