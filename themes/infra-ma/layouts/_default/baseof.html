@@ -4,8 +4,8 @@
   {{ partial "head.html" . }}
 </head>
 <body>
-  {{ partial "header.html" . }}
-  <main class="container">
+  {{ partial "nav.html" . }}
+  <main id="main-content" class="{{ if not .IsHome }}container{{ end }}">
     {{ block "main" . }}{{ end }}
   </main>
   {{ partial "footer.html" . }}

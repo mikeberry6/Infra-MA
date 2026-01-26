@@ -1,34 +1,122 @@
 {{ define "main" }}
-<h1>{{ .Title }}</h1>
-{{ .Content }}
+<div class="deals-page">
+  <div class="deals-page__header">
+    <h1 class="section__title">All Deals</h1>
+    <p class="deals-page__subtitle">{{ .Content }}</p>
+  </div>
 
-<div class="deal-list-grid">
-  {{ range .Pages.ByDate.Reverse }}
-  <a href="{{ .RelPermalink }}" class="deal-list-card">
-    <div class="deal-list-card-header">
-      <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
-        {{ .Params.status | default "Announced" }}
-      </span>
-      {{ with .Params.deal_value }}
-      <span class="deal-list-value">{{ . }}</span>
-      {{ end }}
+  {{/* Filter bar */}}
+  <div class="filter-bar">
+    <div class="filter-bar__controls">
+      <div class="filter-group">
+        <label for="filter-sector">Sector</label>
+        <select id="filter-sector">
+          <option value="">All Sectors</option>
+          <option value="energy">Energy</option>
+          <option value="transport">Transport</option>
+          <option value="digital">Digital</option>
+          <option value="water">Water</option>
+          <option value="social">Social</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-geography">Geography</label>
+        <select id="filter-geography">
+          <option value="">All Geographies</option>
+          {{ $geos := slice }}
+          {{ range .Pages }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
+          {{ range ($geos | uniq | sort) }}
+          <option value="{{ . }}">{{ . }}</option>
+          {{ end }}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-year">Year</label>
+        <select id="filter-year">
+          <option value="">All Years</option>
+          {{ $years := slice }}
+          {{ range .Pages }}{{ $years = $years | append (.Date.Format "2006") }}{{ end }}
+          {{ range ($years | uniq | sort) | collections.Reverse }}
+          <option value="{{ . }}">{{ . }}</option>
+          {{ end }}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-status">Status</label>
+        <select id="filter-status">
+          <option value="">All Statuses</option>
+          <option value="announced">Announced</option>
+          <option value="closed">Closed</option>
+          <option value="terminated">Terminated</option>
+        </select>
+      </div>
+      <div class="filter-group filter-group--search">
+        <label for="filter-search">Search</label>
+        <input type="text" id="filter-search" class="filter-search-input" placeholder="Search deals, buyers, sellers...">
+      </div>
     </div>
-    <h3 class="deal-list-card-title">{{ .Title }}</h3>
-    <div class="deal-list-card-parties">
-      {{ with .Params.buyer }}<span class="deal-list-party"><strong>Buyer:</strong> {{ . }}</span>{{ end }}
-      {{ with .Params.seller }}<span class="deal-list-party"><strong>Seller:</strong> {{ . }}</span>{{ end }}
+    <div class="filter-bar__actions">
+      <div class="filter-pills" id="filter-pills"></div>
+      <button id="filter-reset" class="filter-reset">Clear All</button>
     </div>
-    {{ with .Params.asset }}
-    <div class="deal-list-card-asset"><strong>Asset:</strong> {{ . }}</div>
-    {{ end }}
-    <div class="deal-list-card-footer">
-      {{ with .Params.sector }}<span class="deal-list-tag">{{ . }}</span>{{ end }}
-      {{ with .Params.geography }}<span class="deal-list-tag">{{ . }}</span>{{ end }}
-      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
-    </div>
-  </a>
-  {{ else }}
-  <p>No deals recorded yet.</p>
-  {{ end }}
+    <p class="deals-count">Showing <span id="deals-visible-count">0</span> of <span id="deals-total-count">0</span> deals</p>
+  </div>
+
+  {{/* Table */}}
+  <div class="deals-table-wrap">
+    <table class="deals-table" id="deals-table">
+      <thead>
+        <tr>
+          <th data-sort="title" class="sortable">Deal <span class="sort-arrow"></span></th>
+          <th data-sort="value" class="sortable">Value <span class="sort-arrow"></span></th>
+          <th data-sort="buyer" class="sortable">Buyer <span class="sort-arrow"></span></th>
+          <th data-sort="seller" class="sortable">Seller <span class="sort-arrow"></span></th>
+          <th data-sort="sector" class="sortable">Sector <span class="sort-arrow"></span></th>
+          <th>Geography</th>
+          <th data-sort="date" class="sortable sorted sorted--desc">Date <span class="sort-arrow"></span></th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .Pages.ByDate.Reverse }}
+        <tr class="deal-row"
+            data-title="{{ .Title }}"
+            data-sector="{{ .Params.sector | default "" }}"
+            data-geography="{{ .Params.geography | default "" }}"
+            data-year="{{ .Date.Format "2006" }}"
+            data-status="{{ .Params.status | default "" }}"
+            data-buyer="{{ .Params.buyer | default "" }}"
+            data-seller="{{ .Params.seller | default "" }}"
+            data-value="{{ .Params.deal_value | default "" }}"
+            data-date="{{ .Date.Format "2006-01-02" }}">
+          <td class="deal-cell-title" data-label="Deal">
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+          </td>
+          <td class="deal-cell-value" data-label="Value">{{ .Params.deal_value | default "—" }}</td>
+          <td data-label="Buyer">{{ .Params.buyer | default "—" }}</td>
+          <td data-label="Seller">{{ .Params.seller | default "—" }}</td>
+          <td data-label="Sector">
+            {{ with .Params.sector }}
+            <span class="sector-badge sector-badge--{{ urlize . }}">{{ . }}</span>
+            {{ else }}—{{ end }}
+          </td>
+          <td data-label="Geography">{{ .Params.geography | default "—" }}</td>
+          <td class="deal-cell-date" data-label="Date">
+            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+          </td>
+          <td data-label="Status">
+            <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
+              <span class="deal-card__status-dot"></span>
+              {{ .Params.status | default "announced" }}
+            </span>
+          </td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+  <p class="deals-empty" id="deals-empty" style="display:none;">No deals match your filters. Try adjusting your criteria.</p>
 </div>
+
+<script src="{{ "js/deals.js" | relURL }}"></script>
 {{ end }}

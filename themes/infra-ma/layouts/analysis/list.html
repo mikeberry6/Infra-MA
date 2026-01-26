@@ -1,0 +1,35 @@
+{{ define "main" }}
+<div class="analysis-page">
+  <h1 class="section__title">Market Analysis &amp; Insights</h1>
+
+  {{/* Featured article */}}
+  {{ range first 1 (where .Pages ".Params.featured" true) }}
+  <a href="{{ .RelPermalink }}" class="analysis-featured">
+    <span class="analysis-card__category">{{ .Params.category | default "Analysis" }}</span>
+    <h2 class="analysis-featured__title">{{ .Title }}</h2>
+    <p class="analysis-featured__excerpt">{{ .Params.excerpt | default .Summary }}</p>
+    <div class="analysis-card__meta">
+      {{ with .Params.author }}<span>{{ . }}</span>{{ end }}
+      <span>{{ .Date.Format "Jan 2, 2006" }}</span>
+      <span>{{ math.Round (div (countwords .Content) 200.0) }} min read</span>
+    </div>
+  </a>
+  {{ end }}
+
+  {{/* Article grid */}}
+  <div class="analysis-grid">
+    {{ range .Pages.ByDate.Reverse }}
+    <a href="{{ .RelPermalink }}" class="analysis-card">
+      <span class="analysis-card__category">{{ .Params.category | default "Analysis" }}</span>
+      <h3 class="analysis-card__title">{{ .Title }}</h3>
+      <p class="analysis-card__excerpt">{{ .Params.excerpt | default (.Summary | plainify | truncate 150) }}</p>
+      <div class="analysis-card__meta">
+        {{ with .Params.author }}<span>{{ . }}</span>{{ end }}
+        <span>{{ .Date.Format "Jan 2, 2006" }}</span>
+        <span>{{ math.Round (div (countwords .Content) 200.0) }} min read</span>
+      </div>
+    </a>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

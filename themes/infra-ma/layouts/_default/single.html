@@ -3,23 +3,6 @@
   <header class="article-header">
     <h1>{{ .Title }}</h1>
     <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
-
-    {{ if eq .Section "transactions" }}
-    <div class="transaction-details">
-      {{ with .Params.status }}
-      <span class="transaction-status status-{{ urlize . }}">{{ . }}</span>
-      {{ end }}
-      <table class="details-table">
-        {{ with .Params.acquirer }}<tr><th>Acquirer</th><td>{{ . }}</td></tr>{{ end }}
-        {{ with .Params.target }}<tr><th>Target</th><td>{{ . }}</td></tr>{{ end }}
-        {{ with .Params.value }}<tr><th>Deal Value</th><td>{{ . }}</td></tr>{{ end }}
-        {{ with .Params.sector }}<tr><th>Sector</th><td>{{ . }}</td></tr>{{ end }}
-        {{ with .Params.announced }}<tr><th>Announced</th><td>{{ . }}</td></tr>{{ end }}
-        {{ with .Params.closed }}<tr><th>Closed</th><td>{{ . }}</td></tr>{{ end }}
-        {{ with .Params.advisors }}<tr><th>Advisors</th><td>{{ delimit . ", " }}</td></tr>{{ end }}
-      </table>
-    </div>
-    {{ end }}
   </header>
 
   <div class="article-content">

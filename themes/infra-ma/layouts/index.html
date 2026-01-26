@@ -1,149 +1,76 @@
 {{ define "main" }}
+{{/* ── Hero ── */}}
 <section class="hero">
-  <h1>{{ .Site.Title }}</h1>
-  <p>{{ .Site.Params.description }}</p>
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="hero__content container">
+    <h1 class="hero__title">{{ .Site.Title }}</h1>
+    <p class="hero__tagline">{{ .Site.Params.tagline }}</p>
 
-  {{/* ── Pagefind search ── */}}
-  <div class="search-wrapper">
-    <div id="search" class="search-box"></div>
+    {{/* Stats row */}}
+    {{ $deals := where .Site.RegularPages "Section" "deals" }}
+    {{ $totalDeals := len $deals }}
+    {{ $sectors := slice "energy" "transport" "digital" "water" "social" }}
+    <div class="hero__stats">
+      <div class="hero__stat glass-card">
+        <span class="hero__stat-value" id="stat-deals">{{ $totalDeals }}</span>
+        <span class="hero__stat-label">Deals Tracked</span>
+      </div>
+      <div class="hero__stat glass-card">
+        <span class="hero__stat-value" id="stat-sectors">{{ len $sectors }}</span>
+        <span class="hero__stat-label">Sectors Covered</span>
+      </div>
+      <div class="hero__stat glass-card">
+        {{ $geos := slice }}
+        {{ range $deals }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
+        <span class="hero__stat-value">{{ len ($geos | uniq) }}</span>
+        <span class="hero__stat-label">Geographies</span>
+      </div>
+    </div>
+
+    {{/* Search */}}
+    <div class="hero__search">
+      <div id="search" class="search-box"></div>
+    </div>
+
+    {{/* Scroll indicator */}}
+    <div class="hero__scroll" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+    </div>
   </div>
 </section>
 
-{{/* ── Filter bar ── */}}
-<section class="filter-bar">
-  <div class="filter-group">
-    <label for="filter-sector">Sector</label>
-    <select id="filter-sector">
-      <option value="">All Sectors</option>
-      <option value="energy">Energy</option>
-      <option value="transport">Transport</option>
-      <option value="digital">Digital</option>
-      <option value="water">Water</option>
-      <option value="social">Social</option>
-    </select>
+{{/* ── Recent Deals ── */}}
+<section class="section container">
+  <div class="section__header">
+    <h2 class="section__title">Latest Transactions</h2>
+    <a href="{{ "deals/" | relURL }}" class="section__link">View All Deals
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
   </div>
-  <div class="filter-group">
-    <label for="filter-geography">Geography</label>
-    <select id="filter-geography">
-      <option value="">All Geographies</option>
-      {{ $geos := slice }}
-      {{ range (where .Site.RegularPages "Section" "deals") }}
-        {{ with .Params.geography }}
-          {{ $geos = $geos | append . }}
-        {{ end }}
-      {{ end }}
-      {{ range ($geos | uniq | sort) }}
-      <option value="{{ . }}">{{ . }}</option>
-      {{ end }}
-    </select>
+  <div class="deal-grid">
+    {{ range first 6 (where .Site.RegularPages "Section" "deals").ByDate.Reverse }}
+    {{ partial "deal-card.html" . }}
+    {{ end }}
   </div>
-  <div class="filter-group">
-    <label for="filter-year">Year</label>
-    <select id="filter-year">
-      <option value="">All Years</option>
-      {{ $years := slice }}
-      {{ range (where .Site.RegularPages "Section" "deals") }}
-        {{ $years = $years | append (.Date.Format "2006") }}
-      {{ end }}
-      {{ range ($years | uniq | sort) | collections.Reverse }}
-      <option value="{{ . }}">{{ . }}</option>
-      {{ end }}
-    </select>
-  </div>
-  <button id="filter-reset" class="filter-reset">Reset</button>
 </section>
 
-{{/* ── Deal table ── */}}
-<section class="deals-table-section">
-  <p class="deals-count"><span id="deals-visible-count">0</span> deals</p>
-  <table class="deals-table" id="deals-table">
-    <thead>
-      <tr>
-        <th>Deal</th>
-        <th>Date</th>
-        <th>Buyer</th>
-        <th>Seller</th>
-        <th>Value</th>
-        <th>Sector</th>
-        <th>Geography</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{ range (where .Site.RegularPages "Section" "deals").ByDate.Reverse }}
-      <tr class="deal-row"
-          data-sector="{{ .Params.sector | default "" }}"
-          data-geography="{{ .Params.geography | default "" }}"
-          data-year="{{ .Date.Format "2006" }}">
-        <td class="deal-cell-title">
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-        </td>
-        <td class="deal-cell-date">
-          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
-        </td>
-        <td>{{ .Params.buyer | default "—" }}</td>
-        <td>{{ .Params.seller | default "—" }}</td>
-        <td class="deal-cell-value">{{ .Params.deal_value | default "—" }}</td>
-        <td>
-          {{ with .Params.sector }}
-          <span class="deal-list-tag">{{ . }}</span>
-          {{ else }}—{{ end }}
-        </td>
-        <td>{{ .Params.geography | default "—" }}</td>
-        <td>
-          <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
-            {{ .Params.status | default "announced" }}
-          </span>
-        </td>
-      </tr>
-      {{ end }}
-    </tbody>
-  </table>
-  <p class="deals-empty" id="deals-empty" style="display:none;">No deals match the selected filters.</p>
+{{/* ── Quick filters ── */}}
+<section class="section container">
+  <h2 class="section__title">Browse by Sector</h2>
+  <div class="sector-quick-grid">
+    {{ $sectorNames := dict "energy" "Energy" "transport" "Transport" "digital" "Digital" "water" "Water" "social" "Social" }}
+    {{ $sectorIcons := dict "energy" "M13 2L3 14h9l-1 8 10-12h-9l1-8z" "transport" "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93h2c0 2.84 1.74 5.27 4.2 6.29L9 16h6v6l-2.07-2.07zM12 4c3.95.49 7 3.85 7 7.93h-2c0-2.84-1.74-5.27-4.2-6.29L15 8H9V2l2.07 2.07z" "digital" "M20 3H4a1 1 0 00-1 1v12a1 1 0 001 1h7v2H8v2h8v-2h-3v-2h7a1 1 0 001-1V4a1 1 0 00-1-1zm-1 12H5V5h14v10z" "water" "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-1.45.39-2.81 1.07-3.97l.02.02L12 15l4.93-6.95C18.27 9.53 19 11.19 19 13c0 3.95-2.74 7.26-6.5 7.93z" "social" "M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6 3v2.7l-6 3-6-3v-2.7l6-3zM4 9.96l6 3v5.22l-6-3V9.96zm8 8.22v-5.22l6-3v5.22l-6 3z" }}
+    {{ range $key, $name := $sectorNames }}
+    {{ $count := 0 }}
+    {{ range (where $.Site.RegularPages "Section" "deals") }}
+      {{ if eq .Params.sector $key }}{{ $count = add $count 1 }}{{ end }}
+    {{ end }}
+    <a href="{{ "sectors/" | relURL }}{{ $key }}/" class="sector-quick-card sector-quick-card--{{ $key }}">
+      <svg class="sector-quick-card__icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="{{ index $sectorIcons $key }}"/></svg>
+      <span class="sector-quick-card__name">{{ $name }}</span>
+      <span class="sector-quick-card__count">{{ $count }} {{ if eq $count 1 }}deal{{ else }}deals{{ end }}</span>
+    </a>
+    {{ end }}
+  </div>
 </section>
-
-{{/* ── Filter JS ── */}}
-<script>
-(function () {
-  var sectorEl = document.getElementById('filter-sector');
-  var geoEl    = document.getElementById('filter-geography');
-  var yearEl   = document.getElementById('filter-year');
-  var resetBtn = document.getElementById('filter-reset');
-  var rows     = document.querySelectorAll('.deal-row');
-  var countEl  = document.getElementById('deals-visible-count');
-  var emptyEl  = document.getElementById('deals-empty');
-
-  function applyFilters() {
-    var sector = sectorEl.value.toLowerCase();
-    var geo    = geoEl.value;
-    var year   = yearEl.value;
-    var visible = 0;
-
-    rows.forEach(function (row) {
-      var matchSector = !sector || row.getAttribute('data-sector') === sector;
-      var matchGeo    = !geo    || row.getAttribute('data-geography') === geo;
-      var matchYear   = !year   || row.getAttribute('data-year') === year;
-      var show = matchSector && matchGeo && matchYear;
-      row.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-
-    countEl.textContent = visible;
-    emptyEl.style.display = visible === 0 ? '' : 'none';
-  }
-
-  sectorEl.addEventListener('change', applyFilters);
-  geoEl.addEventListener('change', applyFilters);
-  yearEl.addEventListener('change', applyFilters);
-  resetBtn.addEventListener('click', function () {
-    sectorEl.value = '';
-    geoEl.value = '';
-    yearEl.value = '';
-    applyFilters();
-  });
-
-  // Initial count
-  applyFilters();
-})();
-</script>
 {{ end }}
