@@ -9,5 +9,18 @@
     {{ block "main" . }}{{ end }}
   </main>
   {{ partial "footer.html" . }}
+  <script src="{{ "pagefind/pagefind-ui.js" | relURL }}"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var el = document.getElementById('search');
+      if (el) {
+        new PagefindUI({
+          element: '#search',
+          showSubResults: false,
+          showImages: false
+        });
+      }
+    });
+  </script>
 </body>
 </html>

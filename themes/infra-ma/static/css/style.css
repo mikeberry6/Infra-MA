@@ -1,4 +1,6 @@
-/* Reset & Base */
+/* ═══════════════════════════════════════════════════════
+   Reset & Design Tokens
+   ═══════════════════════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,26 +8,38 @@
 }
 
 :root {
-  --color-primary: #1a3a5c;
-  --color-secondary: #2c7da0;
-  --color-accent: #468faf;
-  --color-bg: #f8f9fa;
+  --color-primary: #0f2b46;
+  --color-primary-light: #17405e;
+  --color-secondary: #2474a2;
+  --color-accent: #3498db;
+  --color-bg: #f5f6f8;
   --color-surface: #ffffff;
-  --color-text: #212529;
-  --color-text-light: #6c757d;
-  --color-border: #dee2e6;
-  --color-success: #198754;
-  --color-warning: #ffc107;
-  --color-danger: #dc3545;
-  --color-info: #0dcaf0;
+  --color-text: #1e293b;
+  --color-text-light: #64748b;
+  --color-text-lighter: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
   --max-width: 1200px;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -37,30 +51,33 @@ body {
 a {
   color: var(--color-secondary);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 a:hover {
   color: var(--color-primary);
-  text-decoration: underline;
 }
 
-/* Header */
+/* ═══════════════════════════════════════════════════════
+   Header
+   ═══════════════════════════════════════════════════════ */
 .site-header {
   background: var(--color-primary);
   color: white;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  border-bottom: 3px solid var(--color-secondary);
 }
 
 .site-header .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 56px;
 }
 
 .site-title {
   color: white;
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -71,93 +88,302 @@ a:hover {
   opacity: 0.9;
 }
 
-.site-nav a {
-  color: rgba(255, 255, 255, 0.85);
-  margin-left: 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
+.site-nav {
+  display: flex;
+  gap: 0;
 }
 
-.site-nav a:hover,
-.site-nav a.active {
+.site-nav a {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0 0.9rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -3px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  margin-left: 0;
+}
+
+.site-nav a:hover {
   color: white;
   text-decoration: none;
+  border-bottom-color: rgba(255,255,255,0.4);
 }
 
-/* Hero */
+.site-nav a.active {
+  color: white;
+  border-bottom-color: white;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Hero
+   ═══════════════════════════════════════════════════════ */
 .hero {
   text-align: center;
-  padding: 3rem 0;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 2rem;
+  padding: 2.5rem 0 2rem;
+  margin-bottom: 0;
 }
 
 .hero h1 {
-  font-size: 2.2rem;
+  font-size: 2rem;
+  font-weight: 800;
   color: var(--color-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.03em;
 }
 
 .hero p {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
+  color: var(--color-text-light);
+  margin-bottom: 1.25rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Search (Pagefind)
+   ═══════════════════════════════════════════════════════ */
+.search-wrapper {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.search-box {
+  --pagefind-ui-scale: 0.9;
+  --pagefind-ui-primary: var(--color-secondary);
+  --pagefind-ui-text: var(--color-text);
+  --pagefind-ui-background: var(--color-surface);
+  --pagefind-ui-border: var(--color-border);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: var(--radius-md);
+  --pagefind-ui-font: var(--font-sans);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Filter Bar
+   ═══════════════════════════════════════════════════════ */
+.filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--color-text-light);
 }
 
-/* Main content */
+.filter-group select {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 2rem;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(36, 116, 162, 0.15);
+}
+
+.filter-reset {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.filter-reset:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Deals Table (Homepage)
+   ═══════════════════════════════════════════════════════ */
+.deals-table-section {
+  margin-bottom: 2.5rem;
+}
+
+.deals-count {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.deals-count span {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.deals-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.deals-table thead th {
+  background: var(--color-primary);
+  color: rgba(255,255,255,0.9);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: none;
+}
+
+.deals-table tbody tr {
+  border-bottom: 1px solid var(--color-border-light);
+  transition: background 0.1s ease;
+}
+
+.deals-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.deals-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.deals-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  vertical-align: middle;
+  color: var(--color-text);
+}
+
+.deal-cell-title {
+  font-weight: 600;
+  max-width: 260px;
+}
+
+.deal-cell-title a {
+  color: var(--color-primary);
+}
+
+.deal-cell-title a:hover {
+  color: var(--color-secondary);
+  text-decoration: underline;
+}
+
+.deal-cell-date {
+  white-space: nowrap;
+  color: var(--color-text-light);
+}
+
+.deal-cell-value {
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.deals-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Main Content Area
+   ═══════════════════════════════════════════════════════ */
 main {
   padding: 2rem 0;
   min-height: 60vh;
 }
 
 main > h1 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
+  font-weight: 800;
   color: var(--color-primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--color-secondary);
+  letter-spacing: -0.02em;
 }
 
-/* Transaction cards */
+/* ═══════════════════════════════════════════════════════
+   Transaction Cards (legacy sections)
+   ═══════════════════════════════════════════════════════ */
 .transaction-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
   margin-top: 1rem;
 }
 
 .transaction-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
   transition: box-shadow 0.2s ease;
-  position: relative;
+  box-shadow: var(--shadow-sm);
 }
 
 .transaction-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .transaction-card h3 {
   margin: 0.75rem 0 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.transaction-card h3 a {
-  color: var(--color-text);
-}
-
-.transaction-card h3 a:hover {
-  color: var(--color-secondary);
-  text-decoration: none;
-}
+.transaction-card h3 a { color: var(--color-text); }
+.transaction-card h3 a:hover { color: var(--color-secondary); text-decoration: none; }
 
 .transaction-meta {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
+  gap: 0.2rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
 }
 
 .meta-item strong {
@@ -166,176 +392,141 @@ main > h1 {
 }
 
 .transaction-card time {
-  font-size: 0.85rem;
-  color: var(--color-text-light);
+  font-size: 0.8rem;
+  color: var(--color-text-lighter);
 }
 
-/* Transaction status badges */
+/* Status badges (transaction) */
 .transaction-status {
   display: inline-block;
-  padding: 0.2rem 0.75rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
-.status-announced,
-.status-pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-completed,
-.status-closed {
-  background: #d1e7dd;
-  color: #0f5132;
-}
-
-.status-terminated,
-.status-withdrawn {
-  background: #f8d7da;
-  color: #842029;
-}
-
-.status-under-review,
-.status-regulatory-review {
-  background: #cff4fc;
-  color: #055160;
-}
+.status-announced, .status-pending { background: #fef3c7; color: #92400e; }
+.status-completed, .status-closed { background: #dcfce7; color: #166534; }
+.status-terminated, .status-withdrawn { background: #fee2e2; color: #991b1b; }
+.status-under-review, .status-regulatory-review { background: #e0f2fe; color: #0c4a6e; }
 
 /* Section headings */
 section h2 {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
+  font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
 }
 
-.recent-transactions,
-.recent-analysis {
-  margin-bottom: 2.5rem;
-}
+.recent-transactions, .recent-analysis { margin-bottom: 2.5rem; }
 
 .view-all {
-  margin-top: 1rem;
-  font-weight: 500;
+  margin-top: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* Analysis list */
-.analysis-list,
-.content-list {
-  list-style: none;
+/* Analysis & content lists */
+.analysis-list, .content-list { list-style: none; }
+
+.analysis-list li, .content-list li {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.analysis-list li,
-.content-list li {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--color-border);
-}
+.analysis-list li:last-child, .content-list li:last-child { border-bottom: none; }
 
-.analysis-list li a,
-.content-list li h3 {
-  font-size: 1.05rem;
-}
-
-.content-list li p {
-  color: var(--color-text-light);
-  margin: 0.25rem 0;
-  font-size: 0.95rem;
-}
-
-.content-list li time,
-.analysis-list li time {
-  font-size: 0.85rem;
-  color: var(--color-text-light);
+.analysis-list li a, .content-list li h3 { font-size: 1rem; font-weight: 600; }
+.content-list li p { color: var(--color-text-light); margin: 0.2rem 0; font-size: 0.9rem; }
+.content-list li time, .analysis-list li time {
+  font-size: 0.8rem;
+  color: var(--color-text-lighter);
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
 }
 
-/* Single article */
+/* ═══════════════════════════════════════════════════════
+   Single Article
+   ═══════════════════════════════════════════════════════ */
 .single {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
   max-width: 900px;
+  box-shadow: var(--shadow-sm);
 }
 
 .article-header h1 {
-  font-size: 1.8rem;
+  font-size: 1.65rem;
+  font-weight: 800;
   color: var(--color-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.02em;
 }
 
 .article-header time {
   color: var(--color-text-light);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .transaction-details {
-  margin: 1.5rem 0;
+  margin: 1.25rem 0;
   padding: 1rem;
   background: var(--color-bg);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
 }
 
 .details-table {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   border-collapse: collapse;
 }
 
-.details-table th,
-.details-table td {
-  padding: 0.5rem 1rem;
+.details-table th, .details-table td {
+  padding: 0.45rem 0.85rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .details-table th {
-  width: 140px;
+  width: 130px;
   color: var(--color-text-light);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .article-content {
   margin-top: 1.5rem;
-  line-height: 1.8;
+  line-height: 1.75;
 }
 
-.article-content h2 {
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-}
-
-.article-content p {
-  margin-bottom: 1rem;
-}
-
-.article-content ul,
-.article-content ol {
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
-}
+.article-content h2 { margin-top: 1.75rem; margin-bottom: 0.65rem; font-size: 1.2rem; font-weight: 700; }
+.article-content p { margin-bottom: 0.85rem; }
+.article-content ul, .article-content ol { margin-bottom: 0.85rem; padding-left: 1.35rem; }
 
 /* Tags */
 .article-tags {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border-light);
 }
 
 .tag {
   display: inline-block;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  font-size: 0.85rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.35rem;
+  margin-bottom: 0.35rem;
+  transition: all 0.15s ease;
 }
 
 .tag:hover {
@@ -345,21 +536,22 @@ section h2 {
   text-decoration: none;
 }
 
-/* Footer */
+/* ═══════════════════════════════════════════════════════
+   Footer
+   ═══════════════════════════════════════════════════════ */
 .site-footer {
   background: var(--color-primary);
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.55);
   text-align: center;
-  padding: 1.5rem 0;
+  padding: 1.25rem 0;
   margin-top: 3rem;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
 /* ═══════════════════════════════════════════════════════
    Deal Profile  (Crunchbase-style)
    ═══════════════════════════════════════════════════════ */
 
-/* ── Header banner ── */
 .deal-profile {
   max-width: 1100px;
 }
@@ -367,9 +559,10 @@ section h2 {
 .deal-header {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 2rem 2.25rem 1.5rem;
   margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .deal-header-top {
@@ -381,62 +574,53 @@ section h2 {
 }
 
 .deal-title {
-  font-size: 1.75rem;
+  font-size: 1.65rem;
+  font-weight: 800;
   color: var(--color-primary);
   line-height: 1.25;
   margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
 }
 
 .deal-subtitle {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--color-text-light);
 }
 
 .deal-header-meta {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-  font-size: 0.85rem;
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+  font-size: 0.82rem;
   color: var(--color-text-light);
 }
 
 .deal-header-meta span::before {
   content: "\2022";
-  margin-right: 0.45rem;
+  margin-right: 0.4rem;
   color: var(--color-border);
 }
 
-/* ── Status badges (deal-specific) ── */
+/* ── Status badges (deal) ── */
 .deal-status {
   display: inline-block;
-  padding: 0.3rem 0.9rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
-.deal-status--announced {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.deal-status--closed {
-  background: #d1e7dd;
-  color: #0f5132;
-}
-
-.deal-status--terminated {
-  background: #f8d7da;
-  color: #842029;
-}
+.deal-status--announced { background: #fef3c7; color: #92400e; }
+.deal-status--closed { background: #dcfce7; color: #166534; }
+.deal-status--terminated { background: #fee2e2; color: #991b1b; }
 
 /* ── Two-column body (sidebar + main) ── */
 .deal-body {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 1.5rem;
   align-items: start;
 }
@@ -450,30 +634,30 @@ section h2 {
 .deal-factcard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .deal-factcard-heading {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-light);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.45rem;
   border-bottom: 1px solid var(--color-border);
 }
 
 .deal-facts {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .deal-fact {
-  padding: 0.65rem 0;
-  border-bottom: 1px solid var(--color-border);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .deal-fact:last-child {
@@ -482,22 +666,22 @@ section h2 {
 }
 
 .deal-fact dt {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-text-light);
-  margin-bottom: 0.15rem;
+  color: var(--color-text-lighter);
+  margin-bottom: 0.1rem;
 }
 
 .deal-fact dd {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--color-text);
 }
 
 .deal-fact--value {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 800;
   color: var(--color-primary);
 }
 
@@ -507,36 +691,37 @@ section h2 {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  margin-right: 0.35rem;
+  margin-right: 0.3rem;
   vertical-align: middle;
 }
 
-.deal-status-dot--announced { background: #ffc107; }
-.deal-status-dot--closed    { background: #198754; }
-.deal-status-dot--terminated { background: #dc3545; }
+.deal-status-dot--announced { background: #f59e0b; }
+.deal-status-dot--closed    { background: #16a34a; }
+.deal-status-dot--terminated { background: #dc2626; }
 
 /* ── Main content column ── */
 .deal-main {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .deal-section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .deal-section-heading {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-light);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.45rem;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -544,38 +729,39 @@ section h2 {
 .deal-parties {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .deal-party-card {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.25rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
 }
 
 .deal-party-role {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-light);
+  color: var(--color-text-lighter);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  padding: 0.15rem 0.5rem;
+  padding: 0.12rem 0.45rem;
   border-radius: 4px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .deal-party-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
 }
 
 .deal-party-desc {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-light);
   line-height: 1.55;
 }
@@ -583,54 +769,42 @@ section h2 {
 /* Asset card */
 .deal-asset-card {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.25rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
 }
 
 .deal-asset-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
 }
 
 .deal-asset-desc {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-light);
   line-height: 1.55;
 }
 
 /* Deal content prose */
 .deal-content {
-  line-height: 1.8;
-  font-size: 0.95rem;
+  line-height: 1.75;
+  font-size: 0.92rem;
 }
 
-.deal-content p {
-  margin-bottom: 1rem;
-}
-
-.deal-content h2 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 1.15rem;
-}
-
-.deal-content ul,
-.deal-content ol {
-  margin-bottom: 1rem;
-  padding-left: 1.25rem;
-}
+.deal-content p { margin-bottom: 0.85rem; }
+.deal-content h2 { margin-top: 1.35rem; margin-bottom: 0.45rem; font-size: 1.1rem; font-weight: 700; }
+.deal-content ul, .deal-content ol { margin-bottom: 0.85rem; padding-left: 1.25rem; }
 
 /* ═══════════════════════════════════════════════════════
-   Deal List Grid
+   Deal List Grid (deals section page)
    ═══════════════════════════════════════════════════════ */
-
 .deal-list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.25rem;
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 
 .deal-list-card {
@@ -638,14 +812,15 @@ section h2 {
   flex-direction: column;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
   color: var(--color-text);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .deal-list-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
   border-color: var(--color-secondary);
   text-decoration: none;
   color: var(--color-text);
@@ -655,110 +830,134 @@ section h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 
 .deal-list-value {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--color-primary);
 }
 
 .deal-list-card-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
 .deal-list-card-parties {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  font-size: 0.88rem;
+  gap: 0.15rem;
+  font-size: 0.83rem;
   color: var(--color-text-light);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 
-.deal-list-card-parties strong {
-  color: var(--color-text-light);
-  font-weight: 600;
-}
+.deal-list-card-parties strong { font-weight: 600; }
 
 .deal-list-card-asset {
-  font-size: 0.88rem;
+  font-size: 0.83rem;
   color: var(--color-text-light);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
 }
 
-.deal-list-card-asset strong {
-  font-weight: 600;
-}
+.deal-list-card-asset strong { font-weight: 600; }
 
 .deal-list-card-footer {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   margin-top: auto;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--color-border);
-  font-size: 0.8rem;
-  color: var(--color-text-light);
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 0.78rem;
+  color: var(--color-text-lighter);
 }
 
 .deal-list-tag {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  padding: 0.1rem 0.5rem;
+  padding: 0.1rem 0.45rem;
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
-/* Responsive */
+/* ═══════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .site-header .container {
     flex-direction: column;
-    gap: 0.75rem;
+    height: auto;
+    padding: 0.75rem 1.5rem;
+    gap: 0.5rem;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+    gap: 0;
   }
 
   .site-nav a {
-    margin-left: 0;
-    margin-right: 1rem;
+    height: auto;
+    padding: 0.35rem 0.65rem;
+    border-bottom: none;
+    margin-bottom: 0;
+    font-size: 0.82rem;
   }
 
-  .transaction-grid {
-    grid-template-columns: 1fr;
+  .hero h1 { font-size: 1.5rem; }
+
+  .filter-bar { flex-direction: column; gap: 0.75rem; }
+  .filter-group { min-width: unset; }
+
+  /* Table becomes card view on mobile */
+  .deals-table thead { display: none; }
+  .deals-table, .deals-table tbody, .deals-table tr, .deals-table td {
+    display: block;
+    width: 100%;
   }
 
-  .hero h1 {
-    font-size: 1.6rem;
+  .deals-table tbody tr {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
   }
 
-  .single {
-    padding: 1.25rem;
+  .deals-table td {
+    padding: 0.2rem 0;
+    font-size: 0.85rem;
   }
 
-  .deal-body {
-    grid-template-columns: 1fr;
+  .deals-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-lighter);
+    display: block;
+    margin-bottom: 0.1rem;
   }
 
-  .deal-sidebar {
-    position: static;
-  }
+  .deal-cell-title { font-size: 0.95rem; }
 
-  .deal-parties {
-    grid-template-columns: 1fr;
-  }
+  .transaction-grid { grid-template-columns: 1fr; }
 
-  .deal-header {
-    padding: 1.25rem;
-  }
+  .single { padding: 1.25rem; }
 
-  .deal-title {
-    font-size: 1.35rem;
-  }
+  .deal-body { grid-template-columns: 1fr; }
+  .deal-sidebar { position: static; }
+  .deal-parties { grid-template-columns: 1fr; }
+  .deal-header { padding: 1.25rem; }
+  .deal-title { font-size: 1.35rem; }
 
-  .deal-list-grid {
-    grid-template-columns: 1fr;
-  }
+  .deal-list-grid { grid-template-columns: 1fr; }
 }
