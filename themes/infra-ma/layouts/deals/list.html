@@ -1,18 +1,28 @@
 {{ define "main" }}
-<div class="deals-page">
+<div class="deals-page dash">
 
-  {{/* ── Last Updated Timestamp (#20) ── */}}
-  <div class="deals-page__header">
-    <h1 class="section__title">All Deals</h1>
-    <p class="deals-page__subtitle">{{ .Content }}</p>
-    <div class="deals-page__updated">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      Data last updated: <time datetime="{{ now.Format "2006-01-02" }}">{{ now.Format "January 2, 2006" }}</time>
-      <span class="deals-page__update-freq">&middot; Updated weekly</span>
+  {{/* ── Page Header ── */}}
+  <header class="dash__header">
+    <div class="dash__header-left">
+      <h1 class="dash__title">Deals</h1>
+      <span class="dash__subtitle">Infrastructure M&amp;A Tracker</span>
     </div>
-  </div>
+    <div class="dash__header-right">
+      <div class="dash__updated">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <time datetime="{{ now.Format "2006-01-02" }}">{{ now.Format "Jan 2, 2006" }}</time>
+      </div>
+      <div class="dash__actions">
+        <button id="export-csv" class="dash__btn dash__btn--ghost" title="Export filtered deals to CSV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button id="export-csv-all" class="dash__btn dash__btn--ghost" title="Export all deals">All CSV</button>
+      </div>
+    </div>
+  </header>
 
-  {{/* ── Summary Statistics Dashboard (#16) ── */}}
+  {{/* ── KPI Bento Grid ── */}}
   {{ $allDeals := .Pages }}
   {{ $totalDeals := len $allDeals }}
   {{ $totalValue := 0.0 }}
@@ -25,46 +35,46 @@
     {{ if eq .Params.status "announced" }}{{ $announcedCount = add $announcedCount 1 }}{{ end }}
     {{ if eq .Params.status "terminated" }}{{ $terminatedCount = add $terminatedCount 1 }}{{ end }}
   {{ end }}
-  <div class="stats-dashboard" id="stats-dashboard">
-    <div class="stats-dashboard__card">
-      <span class="stats-dashboard__value" id="stat-total-deals">{{ $totalDeals }}</span>
-      <span class="stats-dashboard__label">Total Deals</span>
+  <div class="bento" id="stats-dashboard">
+    <div class="bento__card">
+      <span class="bento__label">Total Deals</span>
+      <span class="bento__value" id="stat-total-deals">{{ $totalDeals }}</span>
     </div>
-    <div class="stats-dashboard__card">
-      <span class="stats-dashboard__value" id="stat-total-value">${{ lang.FormatNumberCustom 1 $totalValue }}B</span>
-      <span class="stats-dashboard__label">Total Value (USD)</span>
+    <div class="bento__card">
+      <span class="bento__label">Total Value</span>
+      <span class="bento__value" id="stat-total-value">${{ lang.FormatNumberCustom 1 $totalValue }}B</span>
     </div>
-    <div class="stats-dashboard__card">
-      <span class="stats-dashboard__value" id="stat-avg-size">${{ lang.FormatNumberCustom 1 (div $totalValue (float $totalDeals)) }}B</span>
-      <span class="stats-dashboard__label">Avg Deal Size</span>
+    <div class="bento__card">
+      <span class="bento__label">Avg Deal Size</span>
+      <span class="bento__value" id="stat-avg-size">${{ lang.FormatNumberCustom 1 (div $totalValue (float $totalDeals)) }}B</span>
     </div>
-    <div class="stats-dashboard__card stats-dashboard__card--statuses">
-      <div class="stats-dashboard__status-row">
-        <span class="status-badge status-badge--announced"><span class="status-dot"></span>{{ $announcedCount }} Announced</span>
-        <span class="status-badge status-badge--closed"><span class="status-dot"></span>{{ $closedCount }} Closed</span>
-        <span class="status-badge status-badge--terminated"><span class="status-dot"></span>{{ $terminatedCount }} Terminated</span>
+    <div class="bento__card bento__card--status">
+      <span class="bento__label">Pipeline Status</span>
+      <div class="bento__status-row">
+        <span class="bento__pill bento__pill--announced"><span class="bento__dot"></span>{{ $announcedCount }}</span>
+        <span class="bento__pill bento__pill--closed"><span class="bento__dot"></span>{{ $closedCount }}</span>
+        <span class="bento__pill bento__pill--terminated"><span class="bento__dot"></span>{{ $terminatedCount }}</span>
       </div>
-      <span class="stats-dashboard__label">By Status</span>
     </div>
   </div>
 
-  {{/* ── Sticky Mobile Bar — deal count + filter toggle ── */}}
+  {{/* ── Mobile Sticky Bar ── */}}
   <div class="mobile-sticky-bar" id="mobile-sticky-bar">
     <span class="mobile-sticky-bar__count" aria-live="polite">
-      Showing <span id="mobile-visible-count">0</span> of <span id="mobile-total-count">{{ $totalDeals }}</span> deals
+      <span id="mobile-visible-count">0</span> / <span id="mobile-total-count">{{ $totalDeals }}</span>
     </span>
     <button class="mobile-sticky-bar__filter-btn" id="mobile-filter-toggle" aria-label="Open filters">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-      Filter
+      Filters
     </button>
   </div>
 
   {{/* ── Filter Drawer Overlay (mobile) ── */}}
   <div class="filter-drawer-overlay" id="filter-drawer-overlay"></div>
 
-  {{/* ── Filter Bar (Enhanced: multi-select, date range, value range) ── */}}
-  <div class="filter-bar" id="filter-bar">
-    {{/* Mobile drawer header — only visible on mobile */}}
+  {{/* ── Horizontal Control Bar ── */}}
+  <div class="control-bar" id="filter-bar">
+    {{/* Mobile drawer header */}}
     <div class="filter-drawer-header">
       <h3>Filters</h3>
       <button class="filter-drawer-close" id="filter-drawer-close" aria-label="Close filters">
@@ -72,179 +82,167 @@
       </button>
     </div>
 
-    <div class="filter-bar__controls">
-      {{/* Sector multi-select (#9) */}}
-      <div class="filter-group filter-group--multi">
-        <label>Sector</label>
-        <button class="filter-multi-btn" id="filter-sector-btn" aria-expanded="false" aria-controls="filter-sector-panel">
-          <span class="filter-multi-btn__text">All Sectors</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="filter-multi-panel" id="filter-sector-panel" role="group" aria-label="Sector filter">
-          <label class="filter-check"><input type="checkbox" value="energy" data-filter="sector"> Energy</label>
-          <label class="filter-check"><input type="checkbox" value="transport" data-filter="sector"> Transport</label>
-          <label class="filter-check"><input type="checkbox" value="digital" data-filter="sector"> Digital</label>
-          <label class="filter-check"><input type="checkbox" value="water" data-filter="sector"> Water</label>
-          <label class="filter-check"><input type="checkbox" value="social" data-filter="sector"> Social</label>
-          <div class="filter-multi-actions">
-            <button class="filter-select-all" data-group="sector">Select All</button>
-            <button class="filter-clear-group" data-group="sector">Clear</button>
+    <div class="control-bar__row">
+      {{/* Search — first for visual prominence */}}
+      <div class="control-bar__search">
+        <svg class="control-bar__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="filter-search" class="control-bar__input" placeholder="Search deals..." aria-label="Search deals">
+      </div>
+
+      {{/* Filter dropdowns */}}
+      <div class="control-bar__filters">
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-sector-btn" aria-expanded="false" aria-controls="filter-sector-panel">
+            <span class="filter-multi-btn__text">Sector</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-sector-panel" role="group" aria-label="Sector filter">
+            <label class="filter-check"><input type="checkbox" value="energy" data-filter="sector"> Energy</label>
+            <label class="filter-check"><input type="checkbox" value="transport" data-filter="sector"> Transport</label>
+            <label class="filter-check"><input type="checkbox" value="digital" data-filter="sector"> Digital</label>
+            <label class="filter-check"><input type="checkbox" value="water" data-filter="sector"> Water</label>
+            <label class="filter-check"><input type="checkbox" value="social" data-filter="sector"> Social</label>
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="sector">Select All</button>
+              <button class="filter-clear-group" data-group="sector">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-geo-btn" aria-expanded="false" aria-controls="filter-geo-panel">
+            <span class="filter-multi-btn__text">Geography</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-geo-panel" role="group" aria-label="Geography filter">
+            {{ $geos := slice }}
+            {{ range .Pages }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
+            {{ range ($geos | uniq | sort) }}
+            <label class="filter-check"><input type="checkbox" value="{{ . }}" data-filter="geography"> {{ . }}</label>
+            {{ end }}
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="geography">Select All</button>
+              <button class="filter-clear-group" data-group="geography">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-year-btn" aria-expanded="false" aria-controls="filter-year-panel">
+            <span class="filter-multi-btn__text">Year</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-year-panel" role="group" aria-label="Year filter">
+            {{ $years := slice }}
+            {{ range .Pages }}{{ $years = $years | append (.Date.Format "2006") }}{{ end }}
+            {{ range ($years | uniq | sort) | collections.Reverse }}
+            <label class="filter-check"><input type="checkbox" value="{{ . }}" data-filter="year"> {{ . }}</label>
+            {{ end }}
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="year">Select All</button>
+              <button class="filter-clear-group" data-group="year">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-status-btn" aria-expanded="false" aria-controls="filter-status-panel">
+            <span class="filter-multi-btn__text">Status</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-status-panel" role="group" aria-label="Status filter">
+            <label class="filter-check"><input type="checkbox" value="announced" data-filter="status"> Announced</label>
+            <label class="filter-check"><input type="checkbox" value="closed" data-filter="status"> Closed</label>
+            <label class="filter-check"><input type="checkbox" value="terminated" data-filter="status"> Terminated</label>
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="status">Select All</button>
+              <button class="filter-clear-group" data-group="status">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        {{/* Value presets */}}
+        <div class="filter-group filter-group--value">
+          <div class="control-bar__value-presets">
+            <button class="control-bar__preset" data-min="0" data-max="1">&lt;$1B</button>
+            <button class="control-bar__preset" data-min="1" data-max="5">$1-5B</button>
+            <button class="control-bar__preset" data-min="5" data-max="10">$5-10B</button>
+            <button class="control-bar__preset" data-min="10" data-max="999">$10B+</button>
           </div>
         </div>
       </div>
 
-      {{/* Geography multi-select (#4 dynamic + #9 multi) */}}
-      <div class="filter-group filter-group--multi">
-        <label>Geography</label>
-        <button class="filter-multi-btn" id="filter-geo-btn" aria-expanded="false" aria-controls="filter-geo-panel">
-          <span class="filter-multi-btn__text">All Geographies</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="filter-multi-panel" id="filter-geo-panel" role="group" aria-label="Geography filter">
-          {{ $geos := slice }}
-          {{ range .Pages }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
-          {{ range ($geos | uniq | sort) }}
-          <label class="filter-check"><input type="checkbox" value="{{ . }}" data-filter="geography"> {{ . }}</label>
-          {{ end }}
-          <div class="filter-multi-actions">
-            <button class="filter-select-all" data-group="geography">Select All</button>
-            <button class="filter-clear-group" data-group="geography">Clear</button>
+      {{/* Date + value range (collapsed by default) */}}
+      <div class="control-bar__advanced" id="control-bar-advanced" style="display:none;">
+        <div class="filter-group filter-group--daterange">
+          <label>Date Range</label>
+          <div class="filter-daterange">
+            <input type="date" id="filter-date-from" class="control-bar__date" aria-label="From date">
+            <span class="control-bar__sep">—</span>
+            <input type="date" id="filter-date-to" class="control-bar__date" aria-label="To date">
           </div>
         </div>
-      </div>
-
-      {{/* Year multi-select (#4 dynamic + #9 multi) */}}
-      <div class="filter-group filter-group--multi">
-        <label>Year</label>
-        <button class="filter-multi-btn" id="filter-year-btn" aria-expanded="false" aria-controls="filter-year-panel">
-          <span class="filter-multi-btn__text">All Years</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="filter-multi-panel" id="filter-year-panel" role="group" aria-label="Year filter">
-          {{ $years := slice }}
-          {{ range .Pages }}{{ $years = $years | append (.Date.Format "2006") }}{{ end }}
-          {{ range ($years | uniq | sort) | collections.Reverse }}
-          <label class="filter-check"><input type="checkbox" value="{{ . }}" data-filter="year"> {{ . }}</label>
-          {{ end }}
-          <div class="filter-multi-actions">
-            <button class="filter-select-all" data-group="year">Select All</button>
-            <button class="filter-clear-group" data-group="year">Clear</button>
-          </div>
-        </div>
-      </div>
-
-      {{/* Status multi-select (#9) */}}
-      <div class="filter-group filter-group--multi">
-        <label>Status</label>
-        <button class="filter-multi-btn" id="filter-status-btn" aria-expanded="false" aria-controls="filter-status-panel">
-          <span class="filter-multi-btn__text">All Statuses</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="filter-multi-panel" id="filter-status-panel" role="group" aria-label="Status filter">
-          <label class="filter-check"><input type="checkbox" value="announced" data-filter="status"> Announced</label>
-          <label class="filter-check"><input type="checkbox" value="closed" data-filter="status"> Closed</label>
-          <label class="filter-check"><input type="checkbox" value="terminated" data-filter="status"> Terminated</label>
-          <div class="filter-multi-actions">
-            <button class="filter-select-all" data-group="status">Select All</button>
-            <button class="filter-clear-group" data-group="status">Clear</button>
-          </div>
-        </div>
-      </div>
-
-      {{/* Date Range (#7) */}}
-      <div class="filter-group filter-group--daterange">
-        <label>Date Range</label>
-        <div class="filter-daterange">
-          <input type="date" id="filter-date-from" class="filter-date-input" aria-label="From date">
-          <span class="filter-daterange__sep">to</span>
-          <input type="date" id="filter-date-to" class="filter-date-input" aria-label="To date">
-        </div>
-      </div>
-
-      {{/* Value Range (#8) */}}
-      <div class="filter-group filter-group--value">
-        <label>Deal Value (USD)</label>
-        <div class="filter-value-range">
-          <div class="filter-value-presets">
-            <button class="filter-value-preset" data-min="0" data-max="1">Under $1B</button>
-            <button class="filter-value-preset" data-min="1" data-max="5">$1B&ndash;$5B</button>
-            <button class="filter-value-preset" data-min="5" data-max="10">$5B&ndash;$10B</button>
-            <button class="filter-value-preset" data-min="10" data-max="999">$10B+</button>
-          </div>
+        <div class="filter-group filter-group--value">
+          <label>Custom Value Range ($B)</label>
           <div class="filter-value-custom">
-            <input type="number" id="filter-value-min" class="filter-value-input" placeholder="Min ($B)" min="0" step="0.1" aria-label="Minimum value in billions">
-            <span class="filter-daterange__sep">&ndash;</span>
-            <input type="number" id="filter-value-max" class="filter-value-input" placeholder="Max ($B)" min="0" step="0.1" aria-label="Maximum value in billions">
+            <input type="number" id="filter-value-min" class="control-bar__date" placeholder="Min" min="0" step="0.1" aria-label="Minimum value">
+            <span class="control-bar__sep">—</span>
+            <input type="number" id="filter-value-max" class="control-bar__date" placeholder="Max" min="0" step="0.1" aria-label="Maximum value">
           </div>
         </div>
       </div>
 
-      {{/* Search */}}
-      <div class="filter-group filter-group--search">
-        <label for="filter-search">Search</label>
-        <input type="text" id="filter-search" class="filter-search-input" placeholder="Search deals, buyers, sellers..." aria-label="Search deals">
+      {{/* Actions */}}
+      <div class="control-bar__actions">
+        <button class="control-bar__toggle-adv" id="toggle-advanced" title="Toggle advanced filters">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+        <div class="filter-pills" id="filter-pills" aria-live="polite"></div>
+        <button id="filter-reset" class="control-bar__reset">Clear</button>
       </div>
     </div>
 
-    {{/* Mobile apply button — only visible on mobile inside drawer */}}
+    {{/* Mobile apply button */}}
     <div class="filter-drawer-apply">
       <button class="filter-drawer-apply-btn" id="filter-drawer-apply">Apply Filters</button>
     </div>
-
-    <div class="filter-bar__actions">
-      <div class="filter-pills" id="filter-pills" aria-live="polite"></div>
-      <button id="filter-reset" class="filter-reset">Clear All</button>
-    </div>
-
-    <div class="filter-bar__meta">
-      <p class="deals-count" aria-live="polite">Showing <span id="deals-visible-count">0</span> of <span id="deals-total-count">0</span> deals</p>
-      <div class="deals-actions">
-        {{/* Export CSV (#6) */}}
-        <button id="export-csv" class="btn btn--sm btn--outline" title="Export filtered deals to CSV">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export CSV
-        </button>
-        <button id="export-csv-all" class="btn btn--sm btn--ghost" title="Export all deals to CSV">Export All</button>
-      </div>
-    </div>
   </div>
 
-  {{/* ── Horizontal scrollable filter chips (mobile) ── */}}
+  {{/* ── Filter Chips (mobile) ── */}}
   <div class="filter-chips-scroll" id="filter-chips-scroll" style="display:none;">
     <div class="filter-chips-scroll__inner" id="filter-chips-inner"></div>
   </div>
 
-  {{/* ── Pagination Controls (#13) ── */}}
-  <div class="pagination-controls" id="pagination-controls">
-    <div class="pagination-controls__left">
-      <label for="page-size">Show:</label>
-      <select id="page-size" class="pagination-select">
+  {{/* ── Table Toolbar ── */}}
+  <div class="table-toolbar" id="pagination-controls">
+    <p class="table-toolbar__count" aria-live="polite">
+      Showing <span id="deals-visible-count">0</span> of <span id="deals-total-count">0</span>
+    </p>
+    <div class="table-toolbar__right">
+      <label for="page-size" class="table-toolbar__label">Rows</label>
+      <select id="page-size" class="table-toolbar__select">
         <option value="10">10</option>
         <option value="25" selected>25</option>
         <option value="50">50</option>
         <option value="100">100</option>
       </select>
-      <span>per page</span>
-    </div>
-    <div class="pagination-controls__center" id="pagination-nav"></div>
-    <div class="pagination-controls__right">
-      <label for="page-jump">Go to:</label>
-      <input type="number" id="page-jump" class="pagination-jump" min="1" aria-label="Jump to page">
+      <div class="table-toolbar__pages" id="pagination-nav"></div>
+      <input type="number" id="page-jump" class="table-toolbar__jump" min="1" placeholder="Go to" aria-label="Jump to page">
     </div>
   </div>
 
-  {{/* ── Table (#5 sortable, #2 summaries, #3 sources, #11 status badges, #14 currency, #15 new badge) ── */}}
+  {{/* ── Data Table ── */}}
   <div class="deals-table-wrap">
     <table class="deals-table" id="deals-table">
       <thead>
         <tr>
           <th data-sort="title" class="sortable">Deal <span class="sort-arrow"></span></th>
-          <th data-sort="value" class="sortable">Value <span class="sort-arrow"></span></th>
+          <th data-sort="value" class="sortable th--right">Value <span class="sort-arrow"></span></th>
           <th data-sort="buyer" class="sortable">Buyer <span class="sort-arrow"></span></th>
           <th data-sort="seller" class="sortable">Seller <span class="sort-arrow"></span></th>
           <th data-sort="sector" class="sortable">Sector <span class="sort-arrow"></span></th>
-          <th data-sort="geography" class="sortable">Geography <span class="sort-arrow"></span></th>
-          <th data-sort="date" class="sortable sorted sorted--desc">Date <span class="sort-arrow"></span></th>
+          <th data-sort="geography" class="sortable">Geo <span class="sort-arrow"></span></th>
+          <th data-sort="date" class="sortable sorted sorted--desc th--right">Date <span class="sort-arrow"></span></th>
           <th data-sort="status" class="sortable">Status <span class="sort-arrow"></span></th>
         </tr>
       </thead>
@@ -275,12 +273,12 @@
             <a href="{{ .RelPermalink }}">{{ .Title }}</a>
             {{ if $isNew }}<span class="badge-new" title="Added in the last 14 days">New</span>{{ end }}
             {{ with .Params.source_url }}
-            <a href="{{ . }}" target="_blank" rel="noopener" class="source-link" title="View source">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <a href="{{ . }}" target="_blank" rel="noopener" class="source-link" title="Source">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
             {{ end }}
           </td>
-          <td class="deal-cell-value" data-label="Value">
+          <td class="deal-cell-value td--right" data-label="Value">
             <span class="deal-value-display">{{ .Params.deal_value | default "—" }}</span>
             {{ if and (ne (.Params.currency | default "USD") "USD") .Params.value_usd_billions }}
             <span class="deal-value-usd">(~${{ lang.FormatNumberCustom 1 .Params.value_usd_billions }}B)</span>
@@ -290,21 +288,22 @@
           <td data-label="Seller">{{ .Params.seller | default "—" }}</td>
           <td data-label="Sector">
             {{ with .Params.sector }}
-            <span class="sector-badge sector-badge--{{ urlize . }}">{{ . }}</span>
+            <span class="sector-indicator sector-indicator--{{ urlize . }}">
+              <span class="sector-indicator__dot"></span>
+              {{ . }}
+            </span>
             {{ else }}—{{ end }}
           </td>
           <td data-label="Geography">{{ .Params.geography | default "—" }}</td>
-          <td class="deal-cell-date" data-label="Date">
+          <td class="deal-cell-date td--right" data-label="Date">
             <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
           </td>
           <td data-label="Status">
-            <span class="status-badge status-badge--{{ urlize (.Params.status | default "announced") }}">
-              <span class="status-dot"></span>
+            <span class="status-pill status-pill--{{ urlize (.Params.status | default "announced") }}">
               {{ .Params.status | default "announced" }}
             </span>
           </td>
         </tr>
-        {{/* Summary expandable row (#2) */}}
         {{ with .Params.summary }}
         <tr class="deal-summary-row" aria-hidden="true">
           <td colspan="8">
@@ -316,20 +315,20 @@
       </tbody>
     </table>
   </div>
-  <p class="deals-empty" id="deals-empty" style="display:none;">No deals match your filters. Try adjusting your criteria.</p>
+  <p class="deals-empty" id="deals-empty" style="display:none;">No deals match your filters.</p>
 
-  {{/* ── Load More Button (mobile alternative to pagination) ── */}}
+  {{/* ── Load More (mobile) ── */}}
   <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
-    <button class="load-more-btn" id="load-more-btn">Load More Deals</button>
+    <button class="load-more-btn" id="load-more-btn">Load More</button>
     <p class="load-more-count" id="load-more-count"></p>
   </div>
 
   {{/* ── Bottom Pagination ── */}}
-  <div class="pagination-controls pagination-controls--bottom" id="pagination-controls-bottom"></div>
+  <div class="table-toolbar table-toolbar--bottom" id="pagination-controls-bottom"></div>
 
-  {{/* ── Trend Visualizations (#17) ── */}}
-  <section class="section deals-charts" id="deals-charts">
-    <h2 class="section__title">Deal Trends &amp; Analytics</h2>
+  {{/* ── Charts ── */}}
+  <section class="dash__section" id="deals-charts">
+    <h2 class="dash__section-title">Trends &amp; Analytics</h2>
     <div class="charts-grid">
       <div class="chart-card">
         <h3 class="chart-card__title">Deal Volume by Year</h3>
@@ -350,9 +349,9 @@
     </div>
   </section>
 
-  {{/* ── Geographic Heat Map (#18) ── */}}
-  <section class="section deals-map" id="deals-map-section">
-    <h2 class="section__title">Geographic Distribution</h2>
+  {{/* ── Geographic Distribution ── */}}
+  <section class="dash__section" id="deals-map-section">
+    <h2 class="dash__section-title">Geographic Distribution</h2>
     <div class="geo-map" id="geo-map">
       {{ $geoData := dict }}
       {{ range .Pages }}
@@ -367,7 +366,7 @@
       {{ end }}
       <div class="geo-map__cards">
         {{ range $geo, $data := $geoData }}
-        <button class="geo-map__card" data-geo="{{ $geo }}" title="Click to filter by {{ $geo }}">
+        <button class="geo-map__card" data-geo="{{ $geo }}" title="Filter by {{ $geo }}">
           <span class="geo-map__region">{{ $geo }}</span>
           <span class="geo-map__count">{{ index $data "count" }} deals</span>
           <span class="geo-map__value">${{ lang.FormatNumberCustom 1 (index $data "value") }}B</span>

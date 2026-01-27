@@ -92,6 +92,17 @@
     filterDrawerApply.addEventListener('click', closeFilterDrawer);
   }
 
+  // ── Advanced Filters Toggle ────────────────────────────────────
+  var toggleAdvBtn = document.getElementById('toggle-advanced');
+  var advancedRow = document.getElementById('control-bar-advanced');
+  if (toggleAdvBtn && advancedRow) {
+    toggleAdvBtn.addEventListener('click', function () {
+      var isVisible = advancedRow.style.display !== 'none';
+      advancedRow.style.display = isVisible ? 'none' : '';
+      toggleAdvBtn.classList.toggle('active', !isVisible);
+    });
+  }
+
   // ── Multi-Select Filter Panels ──────────────────────────────────
   var multiGroups = ['sector', 'geography', 'year', 'status'];
   var panels = {};
@@ -172,10 +183,11 @@
   });
 
   // ── Value Preset Buttons ────────────────────────────────────────
-  document.querySelectorAll('.filter-value-preset').forEach(function (btn) {
+  var valuePresetSelector = '.filter-value-preset, .control-bar__preset';
+  document.querySelectorAll(valuePresetSelector).forEach(function (btn) {
     btn.addEventListener('click', function () {
       var isActive = btn.classList.contains('active');
-      document.querySelectorAll('.filter-value-preset').forEach(function (b) {
+      document.querySelectorAll(valuePresetSelector).forEach(function (b) {
         b.classList.remove('active');
       });
       if (isActive) {
@@ -203,9 +215,9 @@
     if (!btn) return;
     var textEl = btn.querySelector('.filter-multi-btn__text');
     if (!textEl) return;
-    var labels = { sector: 'Sectors', geography: 'Geographies', year: 'Years', status: 'Statuses' };
+    var labels = { sector: 'Sector', geography: 'Geography', year: 'Year', status: 'Status' };
     if (selected.length === 0) {
-      textEl.textContent = 'All ' + labels[group];
+      textEl.textContent = labels[group];
     } else if (selected.length === 1) {
       textEl.textContent = selected[0];
     } else {
