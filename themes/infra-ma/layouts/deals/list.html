@@ -8,7 +8,7 @@
     <div class="deals-page__updated">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
       Data last updated: <time datetime="{{ now.Format "2006-01-02" }}">{{ now.Format "January 2, 2006" }}</time>
-      <span class="deals-page__update-freq">· Updated weekly</span>
+      <span class="deals-page__update-freq">&middot; Updated weekly</span>
     </div>
   </div>
 
@@ -48,8 +48,30 @@
     </div>
   </div>
 
+  {{/* ── Sticky Mobile Bar — deal count + filter toggle ── */}}
+  <div class="mobile-sticky-bar" id="mobile-sticky-bar">
+    <span class="mobile-sticky-bar__count" aria-live="polite">
+      Showing <span id="mobile-visible-count">0</span> of <span id="mobile-total-count">{{ $totalDeals }}</span> deals
+    </span>
+    <button class="mobile-sticky-bar__filter-btn" id="mobile-filter-toggle" aria-label="Open filters">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+      Filter
+    </button>
+  </div>
+
+  {{/* ── Filter Drawer Overlay (mobile) ── */}}
+  <div class="filter-drawer-overlay" id="filter-drawer-overlay"></div>
+
   {{/* ── Filter Bar (Enhanced: multi-select, date range, value range) ── */}}
   <div class="filter-bar" id="filter-bar">
+    {{/* Mobile drawer header — only visible on mobile */}}
+    <div class="filter-drawer-header">
+      <h3>Filters</h3>
+      <button class="filter-drawer-close" id="filter-drawer-close" aria-label="Close filters">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
     <div class="filter-bar__controls">
       {{/* Sector multi-select (#9) */}}
       <div class="filter-group filter-group--multi">
@@ -145,13 +167,13 @@
         <div class="filter-value-range">
           <div class="filter-value-presets">
             <button class="filter-value-preset" data-min="0" data-max="1">Under $1B</button>
-            <button class="filter-value-preset" data-min="1" data-max="5">$1B–$5B</button>
-            <button class="filter-value-preset" data-min="5" data-max="10">$5B–$10B</button>
+            <button class="filter-value-preset" data-min="1" data-max="5">$1B&ndash;$5B</button>
+            <button class="filter-value-preset" data-min="5" data-max="10">$5B&ndash;$10B</button>
             <button class="filter-value-preset" data-min="10" data-max="999">$10B+</button>
           </div>
           <div class="filter-value-custom">
             <input type="number" id="filter-value-min" class="filter-value-input" placeholder="Min ($B)" min="0" step="0.1" aria-label="Minimum value in billions">
-            <span class="filter-daterange__sep">–</span>
+            <span class="filter-daterange__sep">&ndash;</span>
             <input type="number" id="filter-value-max" class="filter-value-input" placeholder="Max ($B)" min="0" step="0.1" aria-label="Maximum value in billions">
           </div>
         </div>
@@ -162,6 +184,11 @@
         <label for="filter-search">Search</label>
         <input type="text" id="filter-search" class="filter-search-input" placeholder="Search deals, buyers, sellers..." aria-label="Search deals">
       </div>
+    </div>
+
+    {{/* Mobile apply button — only visible on mobile inside drawer */}}
+    <div class="filter-drawer-apply">
+      <button class="filter-drawer-apply-btn" id="filter-drawer-apply">Apply Filters</button>
     </div>
 
     <div class="filter-bar__actions">
@@ -180,6 +207,11 @@
         <button id="export-csv-all" class="btn btn--sm btn--ghost" title="Export all deals to CSV">Export All</button>
       </div>
     </div>
+  </div>
+
+  {{/* ── Horizontal scrollable filter chips (mobile) ── */}}
+  <div class="filter-chips-scroll" id="filter-chips-scroll" style="display:none;">
+    <div class="filter-chips-scroll__inner" id="filter-chips-inner"></div>
   </div>
 
   {{/* ── Pagination Controls (#13) ── */}}
@@ -237,7 +269,8 @@
             data-date="{{ .Date.Format "2006-01-02" }}"
             data-summary="{{ .Params.summary | default "" }}"
             data-source="{{ .Params.source_url | default "" }}"
-            data-currency="{{ .Params.currency | default "USD" }}">
+            data-currency="{{ .Params.currency | default "USD" }}"
+            data-permalink="{{ .RelPermalink }}">
           <td class="deal-cell-title" data-label="Deal">
             <a href="{{ .RelPermalink }}">{{ .Title }}</a>
             {{ if $isNew }}<span class="badge-new" title="Added in the last 14 days">New</span>{{ end }}
@@ -284,6 +317,12 @@
     </table>
   </div>
   <p class="deals-empty" id="deals-empty" style="display:none;">No deals match your filters. Try adjusting your criteria.</p>
+
+  {{/* ── Load More Button (mobile alternative to pagination) ── */}}
+  <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
+    <button class="load-more-btn" id="load-more-btn">Load More Deals</button>
+    <p class="load-more-count" id="load-more-count"></p>
+  </div>
 
   {{/* ── Bottom Pagination ── */}}
   <div class="pagination-controls pagination-controls--bottom" id="pagination-controls-bottom"></div>

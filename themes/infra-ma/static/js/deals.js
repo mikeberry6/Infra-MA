@@ -28,6 +28,23 @@
   var paginationNav     = document.getElementById('pagination-nav');
   var paginationBottom  = document.getElementById('pagination-controls-bottom');
 
+  // ── Mobile DOM References ───────────────────────────────────────
+  var mobileFilterToggle  = document.getElementById('mobile-filter-toggle');
+  var filterDrawerClose   = document.getElementById('filter-drawer-close');
+  var filterDrawerOverlay = document.getElementById('filter-drawer-overlay');
+  var filterDrawerApply   = document.getElementById('filter-drawer-apply');
+  var filterBar           = document.getElementById('filter-bar');
+  var mobileVisibleCount  = document.getElementById('mobile-visible-count');
+  var mobileTotalCount    = document.getElementById('mobile-total-count');
+  var filterChipsScroll   = document.getElementById('filter-chips-scroll');
+  var filterChipsInner    = document.getElementById('filter-chips-inner');
+  var loadMoreWrap        = document.getElementById('load-more-wrap');
+  var loadMoreBtn         = document.getElementById('load-more-btn');
+  var loadMoreCount       = document.getElementById('load-more-count');
+
+  // ── Mobile Load More State ──────────────────────────────────────
+  var mobileLoadedCount = 10;
+
   // All deal rows (excluding summary rows)
   var allRows = table ? Array.from(table.querySelectorAll('tr.deal-row')) : [];
   // Summary rows (hidden by default, toggled on click)
@@ -37,6 +54,32 @@
   var filteredRows = allRows.slice();
 
   if (totalEl) totalEl.textContent = allRows.length;
+
+  // ── Mobile Filter Drawer Toggle ─────────────────────────────────
+  function openFilterDrawer() {
+    if (filterBar) filterBar.classList.add('filter-bar--drawer-open');
+    if (filterDrawerOverlay) filterDrawerOverlay.style.display = '';
+    document.body.classList.toggle('drawer-open', true);
+  }
+
+  function closeFilterDrawer() {
+    if (filterBar) filterBar.classList.remove('filter-bar--drawer-open');
+    if (filterDrawerOverlay) filterDrawerOverlay.style.display = 'none';
+    document.body.classList.toggle('drawer-open', false);
+  }
+
+  if (mobileFilterToggle) {
+    mobileFilterToggle.addEventListener('click', openFilterDrawer);
+  }
+  if (filterDrawerClose) {
+    filterDrawerClose.addEventListener('click', closeFilterDrawer);
+  }
+  if (filterDrawerOverlay) {
+    filterDrawerOverlay.addEventListener('click', closeFilterDrawer);
+  }
+  if (filterDrawerApply) {
+    filterDrawerApply.addEventListener('click', closeFilterDrawer);
+  }
 
   // ── Multi-Select Filter Panels ──────────────────────────────────
   var multiGroups = ['sector', 'geography', 'year', 'status'];
@@ -159,6 +202,19 @@
     }
   }
 
+  // ── Check if Any Filter is Active ───────────────────────────────
+  function hasActiveFilters() {
+    for (var i = 0; i < multiGroups.length; i++) {
+      if (getSelected(multiGroups[i]).length > 0) return true;
+    }
+    if (searchEl && searchEl.value.trim() !== '') return true;
+    if (dateFrom && dateFrom.value) return true;
+    if (dateTo && dateTo.value) return true;
+    if (valueMin && valueMin.value) return true;
+    if (valueMax && valueMax.value) return true;
+    return false;
+  }
+
   // ── URL Parameters (#10) ────────────────────────────────────────
   function readParams() {
     var p = new URLSearchParams(window.location.search);
@@ -263,6 +319,63 @@
     pillsEl.appendChild(pill);
   }
 
+  // ── Mobile Filter Chips (scrollable) ────────────────────────────
+  function buildMobileChips() {
+    if (!filterChipsInner || !filterChipsScroll) return;
+    filterChipsInner.innerHTML = '';
+
+    var hasChips = false;
+
+    multiGroups.forEach(function (group) {
+      var selected = getSelected(group);
+      var labels = { sector: 'Sector', geography: 'Geography', year: 'Year', status: 'Status' };
+      selected.forEach(function (val) {
+        hasChips = true;
+        var chip = document.createElement('span');
+        chip.className = 'filter-chip';
+        chip.innerHTML = labels[group] + ': ' + val + ' <button aria-label="Remove ' + labels[group] + ' ' + val + ' filter">&times;</button>';
+        chip.querySelector('button').addEventListener('click', function () {
+          var cb = document.querySelector('input[data-filter="' + group + '"][value="' + val + '"]');
+          if (cb) cb.checked = false;
+          applyFilters();
+        });
+        filterChipsInner.appendChild(chip);
+      });
+    });
+
+    if (dateFrom && dateFrom.value) {
+      hasChips = true;
+      addMobileChip('From: ' + dateFrom.value, function () { dateFrom.value = ''; applyFilters(); });
+    }
+    if (dateTo && dateTo.value) {
+      hasChips = true;
+      addMobileChip('To: ' + dateTo.value, function () { dateTo.value = ''; applyFilters(); });
+    }
+    if (valueMin && valueMin.value) {
+      hasChips = true;
+      addMobileChip('Min: $' + valueMin.value + 'B', function () { valueMin.value = ''; applyFilters(); });
+    }
+    if (valueMax && valueMax.value) {
+      hasChips = true;
+      addMobileChip('Max: $' + valueMax.value + 'B', function () { valueMax.value = ''; applyFilters(); });
+    }
+    if (searchEl && searchEl.value) {
+      hasChips = true;
+      addMobileChip('Search: ' + searchEl.value, function () { searchEl.value = ''; applyFilters(); });
+    }
+
+    filterChipsScroll.style.display = hasChips ? '' : 'none';
+  }
+
+  function addMobileChip(text, onRemove) {
+    if (!filterChipsInner) return;
+    var chip = document.createElement('span');
+    chip.className = 'filter-chip';
+    chip.innerHTML = text + ' <button aria-label="Remove filter">&times;</button>';
+    chip.querySelector('button').addEventListener('click', onRemove);
+    filterChipsInner.appendChild(chip);
+  }
+
   // ── Core Filter Logic ───────────────────────────────────────────
   function applyFilters() {
     var sectors = getSelected('sector');
@@ -330,14 +443,26 @@
     // Reset to page 1 when filters change
     currentPage = 1;
 
+    // Reset mobile loaded count when filters change
+    mobileLoadedCount = 10;
+
     // Apply pagination
     applyPagination();
 
     if (countEl) countEl.textContent = filteredRows.length;
-    if (emptyEl) emptyEl.style.display = filteredRows.length === 0 ? '' : 'none';
+
+    // Update mobile sticky bar counts
+    if (mobileVisibleCount && countEl) mobileVisibleCount.textContent = countEl.textContent;
+    if (mobileTotalCount) mobileTotalCount.textContent = allRows.length;
+
+    // Empty message: only show when filteredRows is empty AND filters are active
+    if (emptyEl) {
+      emptyEl.style.display = (filteredRows.length === 0 && hasActiveFilters()) ? '' : 'none';
+    }
 
     writeParams();
     buildPills();
+    buildMobileChips();
 
     // Update charts
     updateCharts();
@@ -455,12 +580,22 @@
   }
 
   function applyPagination() {
+    var isMobile = window.innerWidth < 768;
     var pageSize = getPageSize();
     var totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
     if (currentPage > totalPages) currentPage = totalPages;
 
-    var start = (currentPage - 1) * pageSize;
-    var end = start + pageSize;
+    var start, end;
+
+    if (isMobile) {
+      // Mobile: use load-more pattern
+      start = 0;
+      end = Math.min(mobileLoadedCount, filteredRows.length);
+    } else {
+      // Desktop: use standard pagination
+      start = (currentPage - 1) * pageSize;
+      end = start + pageSize;
+    }
 
     // Hide all rows first
     allRows.forEach(function (row) {
@@ -474,7 +609,7 @@
       }
     });
 
-    // Show only filtered rows on current page
+    // Show only filtered rows on current page/loaded count
     filteredRows.forEach(function (row, idx) {
       if (idx >= start && idx < end) {
         row.style.display = '';
@@ -500,14 +635,51 @@
       }
     });
 
-    renderPagination(totalPages);
+    if (isMobile) {
+      // Mobile: hide pagination, show load-more
+      if (paginationNav) paginationNav.style.display = 'none';
+      if (paginationBottom) paginationBottom.style.display = 'none';
 
-    // Update page jump max
-    if (pageJumpEl) pageJumpEl.max = totalPages;
+      if (loadMoreWrap) {
+        if (filteredRows.length > end) {
+          loadMoreWrap.style.display = '';
+        } else {
+          loadMoreWrap.style.display = 'none';
+        }
+      }
+      if (loadMoreCount) {
+        loadMoreCount.textContent = 'Showing ' + Math.min(end, filteredRows.length) + ' of ' + filteredRows.length;
+      }
 
-    // Show range text
-    var showing = filteredRows.length > 0 ? (start + 1) + '-' + Math.min(end, filteredRows.length) + ' of ' : '0 of ';
-    if (countEl) countEl.textContent = showing + filteredRows.length;
+      // Show range text
+      var showingMobile = filteredRows.length > 0 ? '1-' + Math.min(end, filteredRows.length) + ' of ' : '0 of ';
+      if (countEl) countEl.textContent = showingMobile + filteredRows.length;
+      if (mobileVisibleCount) mobileVisibleCount.textContent = countEl ? countEl.textContent : '';
+    } else {
+      // Desktop: hide load-more, show pagination
+      if (loadMoreWrap) loadMoreWrap.style.display = 'none';
+      if (paginationNav) paginationNav.style.display = '';
+      if (paginationBottom) paginationBottom.style.display = '';
+
+      renderPagination(totalPages);
+
+      // Update page jump max
+      if (pageJumpEl) pageJumpEl.max = totalPages;
+
+      // Show range text
+      var showing = filteredRows.length > 0 ? (start + 1) + '-' + Math.min(end, filteredRows.length) + ' of ' : '0 of ';
+      if (countEl) countEl.textContent = showing + filteredRows.length;
+    }
+  }
+
+  // ── Load More Button ────────────────────────────────────────────
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function () {
+      mobileLoadedCount += 10;
+      applyPagination();
+      // Update mobile visible count after pagination
+      if (mobileVisibleCount && countEl) mobileVisibleCount.textContent = countEl.textContent;
+    });
   }
 
   function renderPagination(totalPages) {
@@ -871,6 +1043,16 @@
       pageJumpEl.value = '';
     });
   }
+
+  // ── Handle Resize: switch between mobile/desktop pagination ─────
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      applyPagination();
+      if (mobileVisibleCount && countEl) mobileVisibleCount.textContent = countEl.textContent;
+    }, 150);
+  });
 
   // ── Initialize ──────────────────────────────────────────────────
   readParams();
