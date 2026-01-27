@@ -1,7 +1,13 @@
 {{/* Deal card component — expects a page context (a deal page) */}}
 {{ $sector := .Params.sector | default "" }}
-{{ $sectorClass := $sector | urlize }}
+{{ $status := .Params.status | default "announced" }}
 <a href="{{ .RelPermalink }}" class="deal-card" data-sector="{{ $sector }}">
+  {{/* Status pill — top-right corner */}}
+  <span class="deal-card__status-pill deal-card__status-pill--{{ urlize $status }}">
+    <span class="deal-card__status-dot deal-card__status-dot--{{ urlize $status }}"></span>
+    {{ $status }}
+  </span>
+
   {{/* Value banner */}}
   {{ with .Params.deal_value }}
   <div class="deal-card__value-banner">
@@ -44,13 +50,12 @@
       {{ end }}
     </div>
 
-    {{/* Footer row: status + date */}}
+    {{/* Footer row: date + monospace value */}}
     <div class="deal-card__footer">
-      <span class="deal-card__status deal-card__status--{{ urlize (.Params.status | default "announced") }}">
-        <span class="deal-card__status-dot"></span>
-        {{ .Params.status | default "announced" }}
-      </span>
       <time class="deal-card__date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+      {{ with .Params.geography }}
+      <span class="deal-card__geo-tag">{{ . }}</span>
+      {{ end }}
     </div>
   </div>
 </a>

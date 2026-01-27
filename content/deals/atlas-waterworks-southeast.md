@@ -17,6 +17,10 @@ sector = 'water'
 geography = 'North America'
 status = 'announced'
 source_url = ''
+summary = 'Atlas Utilities Consortium takes Southeast WaterWorks private in $8.6B deal targeting the fastest-growing US population corridor.'
+date_added = 2024-11-20
+value_usd_billions = 8.6
+currency = 'USD'
 +++
 
 The Atlas Utilities Consortium, a joint venture of two major Canadian pension funds, has announced a definitive agreement to acquire Southeast WaterWorks Holdings in a take-private transaction valued at $8.6 billion including net debt. The offer represents a 32% premium to the undisturbed share price.

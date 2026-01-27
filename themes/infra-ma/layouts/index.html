@@ -1,25 +1,47 @@
 {{ define "main" }}
-{{/* ── Hero ── */}}
-<section class="hero">
+{{ $deals := where .Site.RegularPages "Section" "deals" }}
+{{ $totalDeals := len $deals }}
+{{ $totalValue := 0.0 }}
+{{ $closedCount := 0 }}
+{{ $announcedCount := 0 }}
+{{ $terminatedCount := 0 }}
+{{ range $deals }}
+  {{ with .Params.value_usd_billions }}{{ $totalValue = add $totalValue . }}{{ end }}
+  {{ if eq .Params.status "closed" }}{{ $closedCount = add $closedCount 1 }}{{ end }}
+  {{ if eq .Params.status "announced" }}{{ $announcedCount = add $announcedCount 1 }}{{ end }}
+  {{ if eq .Params.status "terminated" }}{{ $terminatedCount = add $terminatedCount 1 }}{{ end }}
+{{ end }}
+
+{{/* ── Mission Control Hero ── */}}
+<section class="hero hero--ops">
   <div class="hero__bg" aria-hidden="true"></div>
   <div class="hero__content container">
+    <div class="hero__badge">
+      <span class="hero__badge-dot"></span>
+      MONITORING {{ $totalDeals }} DEALS
+    </div>
     <h1 class="hero__title">{{ .Site.Title }}</h1>
     <p class="hero__tagline">{{ .Site.Params.tagline }}</p>
 
-    {{/* Stats row */}}
-    {{ $deals := where .Site.RegularPages "Section" "deals" }}
-    {{ $totalDeals := len $deals }}
-    {{ $sectors := slice "energy" "transport" "digital" "water" "social" }}
+    {{/* Stats row — clean KPI cards */}}
     <div class="hero__stats">
-      <div class="hero__stat glass-card">
+      <div class="hero__stat">
         <span class="hero__stat-value" id="stat-deals">{{ $totalDeals }}</span>
         <span class="hero__stat-label">Deals Tracked</span>
       </div>
-      <div class="hero__stat glass-card">
-        <span class="hero__stat-value" id="stat-sectors">{{ len $sectors }}</span>
-        <span class="hero__stat-label">Sectors Covered</span>
+      <div class="hero__stat">
+        <span class="hero__stat-value">${{ lang.FormatNumberCustom 0 $totalValue }}B</span>
+        <span class="hero__stat-label">Total Value</span>
       </div>
-      <div class="hero__stat glass-card">
+      <div class="hero__stat hero__stat--status">
+        <div class="hero__stat-row">
+          <span class="hero__stat-status hero__stat-status--closed">{{ $closedCount }}</span>
+          <span class="hero__stat-status hero__stat-status--announced">{{ $announcedCount }}</span>
+          <span class="hero__stat-status hero__stat-status--terminated">{{ $terminatedCount }}</span>
+        </div>
+        <span class="hero__stat-label">Closed / Announced / Terminated</span>
+      </div>
+      <div class="hero__stat">
         {{ $geos := slice }}
         {{ range $deals }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
         <span class="hero__stat-value">{{ len ($geos | uniq) }}</span>
@@ -39,36 +61,49 @@
   </div>
 </section>
 
-{{/* ── Recent Deals ── */}}
+{{/* ── Recent Activity Feed — horizontal rows ── */}}
 <section class="section container">
   <div class="section__header">
-    <h2 class="section__title">Latest Transactions</h2>
+    <h2 class="section__title">Recent Activity</h2>
     <a href="{{ "deals/" | relURL }}" class="section__link">View All Deals
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
     </a>
   </div>
-  <div class="deal-grid">
-    {{ range first 6 (where .Site.RegularPages "Section" "deals").ByDate.Reverse }}
-    {{ partial "deal-card.html" . }}
+  {{/* Column headers */}}
+  <div class="deal-row deal-row--header" aria-hidden="true">
+    <span class="deal-row__status"></span>
+    <div class="deal-row__main"><span>Deal</span></div>
+    <div class="deal-row__tags"><span>Sector / Region</span></div>
+    <div class="deal-row__value"><span>Value</span></div>
+    <span class="deal-row__date">Date</span>
+  </div>
+  <div class="deal-list-feed">
+    {{ range first 12 (where .Site.RegularPages "Section" "deals").ByDate.Reverse }}
+    {{ partial "deal-row.html" . }}
     {{ end }}
   </div>
 </section>
 
-{{/* ── Quick filters ── */}}
+{{/* ── Sector Status Board — clean list ── */}}
 <section class="section container">
-  <h2 class="section__title">Browse by Sector</h2>
-  <div class="sector-quick-grid">
+  <h2 class="section__title">Sector Status Board</h2>
+  <div class="sector-list">
     {{ $sectorNames := dict "energy" "Energy" "transport" "Transport" "digital" "Digital" "water" "Water" "social" "Social" }}
-    {{ $sectorIcons := dict "energy" "M13 2L3 14h9l-1 8 10-12h-9l1-8z" "transport" "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93h2c0 2.84 1.74 5.27 4.2 6.29L9 16h6v6l-2.07-2.07zM12 4c3.95.49 7 3.85 7 7.93h-2c0-2.84-1.74-5.27-4.2-6.29L15 8H9V2l2.07 2.07z" "digital" "M20 3H4a1 1 0 00-1 1v12a1 1 0 001 1h7v2H8v2h8v-2h-3v-2h7a1 1 0 001-1V4a1 1 0 00-1-1zm-1 12H5V5h14v10z" "water" "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-1.45.39-2.81 1.07-3.97l.02.02L12 15l4.93-6.95C18.27 9.53 19 11.19 19 13c0 3.95-2.74 7.26-6.5 7.93z" "social" "M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6 3v2.7l-6 3-6-3v-2.7l6-3zM4 9.96l6 3v5.22l-6-3V9.96zm8 8.22v-5.22l6-3v5.22l-6 3z" }}
     {{ range $key, $name := $sectorNames }}
     {{ $count := 0 }}
+    {{ $sectorValue := 0.0 }}
     {{ range (where $.Site.RegularPages "Section" "deals") }}
-      {{ if eq .Params.sector $key }}{{ $count = add $count 1 }}{{ end }}
+      {{ if eq .Params.sector $key }}
+        {{ $count = add $count 1 }}
+        {{ with .Params.value_usd_billions }}{{ $sectorValue = add $sectorValue . }}{{ end }}
+      {{ end }}
     {{ end }}
-    <a href="{{ "sectors/" | relURL }}{{ $key }}/" class="sector-quick-card sector-quick-card--{{ $key }}">
-      <svg class="sector-quick-card__icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="{{ index $sectorIcons $key }}"/></svg>
-      <span class="sector-quick-card__name">{{ $name }}</span>
-      <span class="sector-quick-card__count">{{ $count }} {{ if eq $count 1 }}deal{{ else }}deals{{ end }}</span>
+    <a href="{{ "sectors/" | relURL }}{{ $key }}/" class="sector-row sector-row--{{ $key }}">
+      <span class="sector-row__indicator"></span>
+      <span class="sector-row__name">{{ $name }}</span>
+      <span class="sector-row__count">{{ $count }} deals</span>
+      <span class="sector-row__spacer"></span>
+      <span class="sector-row__value">${{ lang.FormatNumberCustom 1 $sectorValue }}B</span>
     </a>
     {{ end }}
   </div>

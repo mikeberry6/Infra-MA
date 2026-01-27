@@ -17,6 +17,10 @@ sector = 'transport'
 geography = 'Asia-Pacific'
 status = 'announced'
 source_url = ''
+summary = 'Meridian Infrastructure Partners acquires four container terminal concessions across Asia-Pacific handling 8.2M TEUs annually.'
+date_added = 2024-10-15
+value_usd_billions = 4.1
+currency = 'USD'
 +++
 
 Meridian Infrastructure Partners has agreed to acquire Pacific Gateway Terminals, a portfolio of four container terminal concessions across Asia-Pacific, from Vanguard Port Holdings. The transaction values the business at approximately $4.1 billion including assumed debt.

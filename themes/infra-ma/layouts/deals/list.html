@@ -1,84 +1,259 @@
 {{ define "main" }}
-<div class="deals-page">
-  <div class="deals-page__header">
-    <h1 class="section__title">All Deals</h1>
-    <p class="deals-page__subtitle">{{ .Content }}</p>
-  </div>
+<div class="deals-page dash">
 
-  {{/* Filter bar */}}
-  <div class="filter-bar">
-    <div class="filter-bar__controls">
-      <div class="filter-group">
-        <label for="filter-sector">Sector</label>
-        <select id="filter-sector">
-          <option value="">All Sectors</option>
-          <option value="energy">Energy</option>
-          <option value="transport">Transport</option>
-          <option value="digital">Digital</option>
-          <option value="water">Water</option>
-          <option value="social">Social</option>
-        </select>
+  {{/* ── Page Header ── */}}
+  <header class="dash__header">
+    <div class="dash__header-left">
+      <h1 class="dash__title">Deals</h1>
+      <span class="dash__subtitle">Infrastructure M&amp;A Tracker</span>
+    </div>
+    <div class="dash__header-right">
+      <div class="dash__updated">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <time datetime="{{ now.Format "2006-01-02" }}">{{ now.Format "Jan 2, 2006" }}</time>
       </div>
-      <div class="filter-group">
-        <label for="filter-geography">Geography</label>
-        <select id="filter-geography">
-          <option value="">All Geographies</option>
-          {{ $geos := slice }}
-          {{ range .Pages }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
-          {{ range ($geos | uniq | sort) }}
-          <option value="{{ . }}">{{ . }}</option>
-          {{ end }}
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="filter-year">Year</label>
-        <select id="filter-year">
-          <option value="">All Years</option>
-          {{ $years := slice }}
-          {{ range .Pages }}{{ $years = $years | append (.Date.Format "2006") }}{{ end }}
-          {{ range ($years | uniq | sort) | collections.Reverse }}
-          <option value="{{ . }}">{{ . }}</option>
-          {{ end }}
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="filter-status">Status</label>
-        <select id="filter-status">
-          <option value="">All Statuses</option>
-          <option value="announced">Announced</option>
-          <option value="closed">Closed</option>
-          <option value="terminated">Terminated</option>
-        </select>
-      </div>
-      <div class="filter-group filter-group--search">
-        <label for="filter-search">Search</label>
-        <input type="text" id="filter-search" class="filter-search-input" placeholder="Search deals, buyers, sellers...">
+      <div class="dash__actions">
+        <button id="export-csv" class="dash__btn dash__btn--ghost" title="Export filtered deals to CSV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button id="export-csv-all" class="dash__btn dash__btn--ghost" title="Export all deals">All CSV</button>
       </div>
     </div>
-    <div class="filter-bar__actions">
-      <div class="filter-pills" id="filter-pills"></div>
-      <button id="filter-reset" class="filter-reset">Clear All</button>
+  </header>
+
+  {{/* ── KPI Bento Grid ── */}}
+  {{ $allDeals := .Pages }}
+  {{ $totalDeals := len $allDeals }}
+  {{ $totalValue := 0.0 }}
+  {{ $closedCount := 0 }}
+  {{ $announcedCount := 0 }}
+  {{ $terminatedCount := 0 }}
+  {{ range $allDeals }}
+    {{ with .Params.value_usd_billions }}{{ $totalValue = add $totalValue . }}{{ end }}
+    {{ if eq .Params.status "closed" }}{{ $closedCount = add $closedCount 1 }}{{ end }}
+    {{ if eq .Params.status "announced" }}{{ $announcedCount = add $announcedCount 1 }}{{ end }}
+    {{ if eq .Params.status "terminated" }}{{ $terminatedCount = add $terminatedCount 1 }}{{ end }}
+  {{ end }}
+  <div class="bento" id="stats-dashboard">
+    <div class="bento__card">
+      <span class="bento__label">Total Deals</span>
+      <span class="bento__value" id="stat-total-deals">{{ $totalDeals }}</span>
     </div>
-    <p class="deals-count">Showing <span id="deals-visible-count">0</span> of <span id="deals-total-count">0</span> deals</p>
+    <div class="bento__card">
+      <span class="bento__label">Total Value</span>
+      <span class="bento__value" id="stat-total-value">${{ lang.FormatNumberCustom 1 $totalValue }}B</span>
+    </div>
+    <div class="bento__card">
+      <span class="bento__label">Avg Deal Size</span>
+      <span class="bento__value" id="stat-avg-size">${{ lang.FormatNumberCustom 1 (div $totalValue (float $totalDeals)) }}B</span>
+    </div>
+    <div class="bento__card bento__card--status">
+      <span class="bento__label">Pipeline Status</span>
+      <div class="bento__status-row">
+        <span class="bento__pill bento__pill--announced"><span class="bento__dot"></span>{{ $announcedCount }}</span>
+        <span class="bento__pill bento__pill--closed"><span class="bento__dot"></span>{{ $closedCount }}</span>
+        <span class="bento__pill bento__pill--terminated"><span class="bento__dot"></span>{{ $terminatedCount }}</span>
+      </div>
+    </div>
   </div>
 
-  {{/* Table */}}
+  {{/* ── Mobile Sticky Bar ── */}}
+  <div class="mobile-sticky-bar" id="mobile-sticky-bar">
+    <span class="mobile-sticky-bar__count" aria-live="polite">
+      <span id="mobile-visible-count">0</span> / <span id="mobile-total-count">{{ $totalDeals }}</span>
+    </span>
+    <button class="mobile-sticky-bar__filter-btn" id="mobile-filter-toggle" aria-label="Open filters">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+      Filters
+    </button>
+  </div>
+
+  {{/* ── Filter Drawer Overlay (mobile) ── */}}
+  <div class="filter-drawer-overlay" id="filter-drawer-overlay"></div>
+
+  {{/* ── Horizontal Control Bar ── */}}
+  <div class="control-bar" id="filter-bar">
+    {{/* Mobile drawer header */}}
+    <div class="filter-drawer-header">
+      <h3>Filters</h3>
+      <button class="filter-drawer-close" id="filter-drawer-close" aria-label="Close filters">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="control-bar__row">
+      {{/* Search — first for visual prominence */}}
+      <div class="control-bar__search">
+        <svg class="control-bar__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="filter-search" class="control-bar__input" placeholder="Search deals..." aria-label="Search deals">
+      </div>
+
+      {{/* Filter dropdowns */}}
+      <div class="control-bar__filters">
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-sector-btn" aria-expanded="false" aria-controls="filter-sector-panel">
+            <span class="filter-multi-btn__text">Sector</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-sector-panel" role="group" aria-label="Sector filter">
+            <label class="filter-check"><input type="checkbox" value="energy" data-filter="sector"> Energy</label>
+            <label class="filter-check"><input type="checkbox" value="transport" data-filter="sector"> Transport</label>
+            <label class="filter-check"><input type="checkbox" value="digital" data-filter="sector"> Digital</label>
+            <label class="filter-check"><input type="checkbox" value="water" data-filter="sector"> Water</label>
+            <label class="filter-check"><input type="checkbox" value="social" data-filter="sector"> Social</label>
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="sector">Select All</button>
+              <button class="filter-clear-group" data-group="sector">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-geo-btn" aria-expanded="false" aria-controls="filter-geo-panel">
+            <span class="filter-multi-btn__text">Geography</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-geo-panel" role="group" aria-label="Geography filter">
+            {{ $geos := slice }}
+            {{ range .Pages }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
+            {{ range ($geos | uniq | sort) }}
+            <label class="filter-check"><input type="checkbox" value="{{ . }}" data-filter="geography"> {{ . }}</label>
+            {{ end }}
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="geography">Select All</button>
+              <button class="filter-clear-group" data-group="geography">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-year-btn" aria-expanded="false" aria-controls="filter-year-panel">
+            <span class="filter-multi-btn__text">Year</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-year-panel" role="group" aria-label="Year filter">
+            {{ $years := slice }}
+            {{ range .Pages }}{{ $years = $years | append (.Date.Format "2006") }}{{ end }}
+            {{ range ($years | uniq | sort) | collections.Reverse }}
+            <label class="filter-check"><input type="checkbox" value="{{ . }}" data-filter="year"> {{ . }}</label>
+            {{ end }}
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="year">Select All</button>
+              <button class="filter-clear-group" data-group="year">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group filter-group--multi">
+          <button class="control-bar__select" id="filter-status-btn" aria-expanded="false" aria-controls="filter-status-panel">
+            <span class="filter-multi-btn__text">Status</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-multi-panel" id="filter-status-panel" role="group" aria-label="Status filter">
+            <label class="filter-check"><input type="checkbox" value="announced" data-filter="status"> Announced</label>
+            <label class="filter-check"><input type="checkbox" value="closed" data-filter="status"> Closed</label>
+            <label class="filter-check"><input type="checkbox" value="terminated" data-filter="status"> Terminated</label>
+            <div class="filter-multi-actions">
+              <button class="filter-select-all" data-group="status">Select All</button>
+              <button class="filter-clear-group" data-group="status">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        {{/* Value presets */}}
+        <div class="filter-group filter-group--value">
+          <div class="control-bar__value-presets">
+            <button class="control-bar__preset" data-min="0" data-max="1">&lt;$1B</button>
+            <button class="control-bar__preset" data-min="1" data-max="5">$1-5B</button>
+            <button class="control-bar__preset" data-min="5" data-max="10">$5-10B</button>
+            <button class="control-bar__preset" data-min="10" data-max="999">$10B+</button>
+          </div>
+        </div>
+      </div>
+
+      {{/* Date + value range (collapsed by default) */}}
+      <div class="control-bar__advanced" id="control-bar-advanced" style="display:none;">
+        <div class="filter-group filter-group--daterange">
+          <label>Date Range</label>
+          <div class="filter-daterange">
+            <input type="date" id="filter-date-from" class="control-bar__date" aria-label="From date">
+            <span class="control-bar__sep">—</span>
+            <input type="date" id="filter-date-to" class="control-bar__date" aria-label="To date">
+          </div>
+        </div>
+        <div class="filter-group filter-group--value">
+          <label>Custom Value Range ($B)</label>
+          <div class="filter-value-custom">
+            <input type="number" id="filter-value-min" class="control-bar__date" placeholder="Min" min="0" step="0.1" aria-label="Minimum value">
+            <span class="control-bar__sep">—</span>
+            <input type="number" id="filter-value-max" class="control-bar__date" placeholder="Max" min="0" step="0.1" aria-label="Maximum value">
+          </div>
+        </div>
+      </div>
+
+      {{/* Actions */}}
+      <div class="control-bar__actions">
+        <button class="control-bar__toggle-adv" id="toggle-advanced" title="Toggle advanced filters">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+        <div class="filter-pills" id="filter-pills" aria-live="polite"></div>
+        <button id="filter-reset" class="control-bar__reset">Clear</button>
+      </div>
+    </div>
+
+    {{/* Mobile apply button */}}
+    <div class="filter-drawer-apply">
+      <button class="filter-drawer-apply-btn" id="filter-drawer-apply">Apply Filters</button>
+    </div>
+  </div>
+
+  {{/* ── Filter Chips (mobile) ── */}}
+  <div class="filter-chips-scroll" id="filter-chips-scroll" style="display:none;">
+    <div class="filter-chips-scroll__inner" id="filter-chips-inner"></div>
+  </div>
+
+  {{/* ── Table Toolbar ── */}}
+  <div class="table-toolbar" id="pagination-controls">
+    <p class="table-toolbar__count" aria-live="polite">
+      Showing <span id="deals-visible-count">0</span> of <span id="deals-total-count">0</span>
+    </p>
+    <div class="table-toolbar__right">
+      <label for="page-size" class="table-toolbar__label">Rows</label>
+      <select id="page-size" class="table-toolbar__select">
+        <option value="10">10</option>
+        <option value="25" selected>25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <div class="table-toolbar__pages" id="pagination-nav"></div>
+      <input type="number" id="page-jump" class="table-toolbar__jump" min="1" placeholder="Go to" aria-label="Jump to page">
+    </div>
+  </div>
+
+  {{/* ── Data Table ── */}}
   <div class="deals-table-wrap">
     <table class="deals-table" id="deals-table">
       <thead>
         <tr>
           <th data-sort="title" class="sortable">Deal <span class="sort-arrow"></span></th>
-          <th data-sort="value" class="sortable">Value <span class="sort-arrow"></span></th>
+          <th data-sort="value" class="sortable th--right">Value <span class="sort-arrow"></span></th>
           <th data-sort="buyer" class="sortable">Buyer <span class="sort-arrow"></span></th>
           <th data-sort="seller" class="sortable">Seller <span class="sort-arrow"></span></th>
           <th data-sort="sector" class="sortable">Sector <span class="sort-arrow"></span></th>
-          <th>Geography</th>
-          <th data-sort="date" class="sortable sorted sorted--desc">Date <span class="sort-arrow"></span></th>
-          <th>Status</th>
+          <th data-sort="geography" class="sortable">Geo <span class="sort-arrow"></span></th>
+          <th data-sort="date" class="sortable sorted sorted--desc th--right">Date <span class="sort-arrow"></span></th>
+          <th data-sort="status" class="sortable">Status <span class="sort-arrow"></span></th>
         </tr>
       </thead>
       <tbody>
         {{ range .Pages.ByDate.Reverse }}
+        {{ $isNew := false }}
+        {{ with .Params.date_added }}
+          {{ $added := time . }}
+          {{ $cutoff := now.AddDate 0 0 -14 }}
+          {{ if gt $added $cutoff }}{{ $isNew = true }}{{ end }}
+        {{ end }}
         <tr class="deal-row"
             data-title="{{ .Title }}"
             data-sector="{{ .Params.sector | default "" }}"
@@ -88,35 +263,122 @@
             data-buyer="{{ .Params.buyer | default "" }}"
             data-seller="{{ .Params.seller | default "" }}"
             data-value="{{ .Params.deal_value | default "" }}"
-            data-date="{{ .Date.Format "2006-01-02" }}">
+            data-value-usd="{{ .Params.value_usd_billions | default 0 }}"
+            data-date="{{ .Date.Format "2006-01-02" }}"
+            data-summary="{{ .Params.summary | default "" }}"
+            data-source="{{ .Params.source_url | default "" }}"
+            data-currency="{{ .Params.currency | default "USD" }}"
+            data-permalink="{{ .RelPermalink }}">
           <td class="deal-cell-title" data-label="Deal">
             <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            {{ if $isNew }}<span class="badge-new" title="Added in the last 14 days">New</span>{{ end }}
+            {{ with .Params.source_url }}
+            <a href="{{ . }}" target="_blank" rel="noopener" class="source-link" title="Source">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            {{ end }}
           </td>
-          <td class="deal-cell-value" data-label="Value">{{ .Params.deal_value | default "—" }}</td>
+          <td class="deal-cell-value td--right" data-label="Value">
+            <span class="deal-value-display">{{ .Params.deal_value | default "—" }}</span>
+            {{ if and (ne (.Params.currency | default "USD") "USD") .Params.value_usd_billions }}
+            <span class="deal-value-usd">(~${{ lang.FormatNumberCustom 1 .Params.value_usd_billions }}B)</span>
+            {{ end }}
+          </td>
           <td data-label="Buyer">{{ .Params.buyer | default "—" }}</td>
           <td data-label="Seller">{{ .Params.seller | default "—" }}</td>
           <td data-label="Sector">
             {{ with .Params.sector }}
-            <span class="sector-badge sector-badge--{{ urlize . }}">{{ . }}</span>
+            <span class="sector-indicator sector-indicator--{{ urlize . }}">
+              <span class="sector-indicator__dot"></span>
+              {{ . }}
+            </span>
             {{ else }}—{{ end }}
           </td>
           <td data-label="Geography">{{ .Params.geography | default "—" }}</td>
-          <td class="deal-cell-date" data-label="Date">
+          <td class="deal-cell-date td--right" data-label="Date">
             <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
           </td>
           <td data-label="Status">
-            <span class="deal-status deal-status--{{ urlize (.Params.status | default "announced") }}">
-              <span class="deal-card__status-dot"></span>
+            <span class="status-pill status-pill--{{ urlize (.Params.status | default "announced") }}">
               {{ .Params.status | default "announced" }}
             </span>
           </td>
         </tr>
+        {{ with .Params.summary }}
+        <tr class="deal-summary-row" aria-hidden="true">
+          <td colspan="8">
+            <div class="deal-summary-content">{{ . }}</div>
+          </td>
+        </tr>
+        {{ end }}
         {{ end }}
       </tbody>
     </table>
   </div>
-  <p class="deals-empty" id="deals-empty" style="display:none;">No deals match your filters. Try adjusting your criteria.</p>
+  <p class="deals-empty" id="deals-empty" style="display:none;">No deals match your filters.</p>
+
+  {{/* ── Load More (mobile) ── */}}
+  <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
+    <button class="load-more-btn" id="load-more-btn">Load More</button>
+    <p class="load-more-count" id="load-more-count"></p>
+  </div>
+
+  {{/* ── Bottom Pagination ── */}}
+  <div class="table-toolbar table-toolbar--bottom" id="pagination-controls-bottom"></div>
+
+  {{/* ── Charts ── */}}
+  <section class="dash__section" id="deals-charts">
+    <h2 class="dash__section-title">Trends &amp; Analytics</h2>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-card__title">Deal Volume by Year</h3>
+        <canvas id="chart-volume" width="400" height="250"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-card__title">Deal Value by Year (USD B)</h3>
+        <canvas id="chart-value" width="400" height="250"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-card__title">Sector Breakdown</h3>
+        <canvas id="chart-sector" width="400" height="250"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-card__title">Geography Breakdown</h3>
+        <canvas id="chart-geography" width="400" height="250"></canvas>
+      </div>
+    </div>
+  </section>
+
+  {{/* ── Geographic Distribution ── */}}
+  <section class="dash__section" id="deals-map-section">
+    <h2 class="dash__section-title">Geographic Distribution</h2>
+    <div class="geo-map" id="geo-map">
+      {{ $geoData := dict }}
+      {{ range .Pages }}
+        {{ $geo := .Params.geography | default "Unknown" }}
+        {{ $val := .Params.value_usd_billions | default 0.0 }}
+        {{ if isset $geoData $geo }}
+          {{ $existing := index $geoData $geo }}
+          {{ $geoData = merge $geoData (dict $geo (dict "count" (add (index $existing "count") 1) "value" (add (index $existing "value") $val))) }}
+        {{ else }}
+          {{ $geoData = merge $geoData (dict $geo (dict "count" 1 "value" $val)) }}
+        {{ end }}
+      {{ end }}
+      <div class="geo-map__cards">
+        {{ range $geo, $data := $geoData }}
+        <button class="geo-map__card" data-geo="{{ $geo }}" title="Filter by {{ $geo }}">
+          <span class="geo-map__region">{{ $geo }}</span>
+          <span class="geo-map__count">{{ index $data "count" }} deals</span>
+          <span class="geo-map__value">${{ lang.FormatNumberCustom 1 (index $data "value") }}B</span>
+          <div class="geo-map__bar" style="--bar-width: {{ mul (div (float (index $data "count")) (float $totalDeals)) 100 }}%"></div>
+        </button>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="{{ "js/deals.js" | relURL }}"></script>
 {{ end }}

@@ -17,6 +17,10 @@ sector = 'energy'
 geography = 'Europe'
 status = 'closed'
 source_url = ''
+summary = 'Alpine Energy Capital acquires a 2.1 GW Nordic onshore wind portfolio spanning Norway, Sweden, and Finland from Strandvik Energy.'
+date_added = 2024-09-01
+value_usd_billions = 3.5
+currency = 'EUR'
 +++
 
 Alpine Energy Capital has completed the acquisition of a 2.1 GW onshore wind portfolio spanning three Nordic countries from Strandvik Energy. The transaction closed following receipt of all necessary regulatory approvals and antitrust clearances.

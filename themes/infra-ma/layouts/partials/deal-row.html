@@ -1,0 +1,24 @@
+{{/* Deal row component — horizontal list item for homepage feed */}}
+{{ $sector := .Params.sector | default "" }}
+{{ $status := .Params.status | default "announced" }}
+<a href="{{ .RelPermalink }}" class="deal-row">
+  <span class="deal-row__status">
+    <span class="deal-row__status-dot deal-row__status-dot--{{ urlize $status }}"></span>
+  </span>
+  <div class="deal-row__main">
+    <span class="deal-row__title">{{ .Title }}</span>
+    <span class="deal-row__meta">
+      {{ with .Params.buyer }}<span class="deal-row__party">{{ . }}</span>{{ end }}
+      {{ if and .Params.buyer .Params.seller }}<span class="deal-row__arrow">&rarr;</span>{{ end }}
+      {{ with .Params.seller }}<span class="deal-row__party">{{ . }}</span>{{ end }}
+    </span>
+  </div>
+  <div class="deal-row__tags">
+    {{ with $sector }}<span class="deal-row__sector deal-row__sector--{{ urlize . }}">{{ . }}</span>{{ end }}
+    {{ with .Params.geography }}<span class="deal-row__geo">{{ . }}</span>{{ end }}
+  </div>
+  <div class="deal-row__value">
+    {{ with .Params.deal_value }}{{ . }}{{ end }}
+  </div>
+  <time class="deal-row__date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2006" }}</time>
+</a>
