@@ -22,13 +22,40 @@
     </button>
   </div>
 </header>
+<div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
 <script>
 (function(){
-  var btn=document.getElementById('nav-toggle'),nav=document.getElementById('nav-links');
+  var btn=document.getElementById('nav-toggle');
+  var nav=document.getElementById('nav-links');
+  var overlay=document.getElementById('nav-overlay');
+
+  function openMenu(){
+    nav.classList.add('nav-links--open');
+    btn.classList.add('nav-toggle--open');
+    btn.setAttribute('aria-expanded','true');
+    overlay.classList.add('nav-overlay--visible');
+    document.body.classList.add('nav-open');
+  }
+
+  function closeMenu(){
+    nav.classList.remove('nav-links--open');
+    btn.classList.remove('nav-toggle--open');
+    btn.setAttribute('aria-expanded','false');
+    overlay.classList.remove('nav-overlay--visible');
+    document.body.classList.remove('nav-open');
+  }
+
   btn.addEventListener('click',function(){
-    var open=nav.classList.toggle('nav-links--open');
-    btn.classList.toggle('nav-toggle--open',open);
-    btn.setAttribute('aria-expanded',open);
+    var isOpen=nav.classList.contains('nav-links--open');
+    if(isOpen){closeMenu();}else{openMenu();}
   });
+
+  overlay.addEventListener('click',closeMenu);
+
+  // Close on link click (mobile)
+  var links=nav.querySelectorAll('.nav-link');
+  for(var i=0;i<links.length;i++){
+    links[i].addEventListener('click',closeMenu);
+  }
 })();
 </script>

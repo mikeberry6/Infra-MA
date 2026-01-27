@@ -58,14 +58,25 @@
   // ── Mobile Filter Drawer Toggle ─────────────────────────────────
   function openFilterDrawer() {
     if (filterBar) filterBar.classList.add('filter-bar--drawer-open');
-    if (filterDrawerOverlay) filterDrawerOverlay.style.display = '';
-    document.body.classList.toggle('drawer-open', true);
+    if (filterDrawerOverlay) {
+      filterDrawerOverlay.style.display = '';
+      filterDrawerOverlay.classList.add('filter-drawer-overlay--visible');
+    }
+    document.body.classList.add('drawer-open');
   }
 
   function closeFilterDrawer() {
     if (filterBar) filterBar.classList.remove('filter-bar--drawer-open');
-    if (filterDrawerOverlay) filterDrawerOverlay.style.display = 'none';
-    document.body.classList.toggle('drawer-open', false);
+    if (filterDrawerOverlay) {
+      filterDrawerOverlay.classList.remove('filter-drawer-overlay--visible');
+      // Keep display until transition ends
+      setTimeout(function() {
+        if (!filterDrawerOverlay.classList.contains('filter-drawer-overlay--visible')) {
+          filterDrawerOverlay.style.display = 'none';
+        }
+      }, 350);
+    }
+    document.body.classList.remove('drawer-open');
   }
 
   if (mobileFilterToggle) {
@@ -1043,6 +1054,54 @@
       pageJumpEl.value = '';
     });
   }
+
+  // ── Mobile: Card tap navigation ─────────────────────────────────
+  // On mobile, tapping a table card row navigates to the deal page
+  if (tbody) {
+    tbody.addEventListener('click', function (e) {
+      if (window.innerWidth >= 768) return;
+      var row = e.target.closest('tr.deal-row');
+      if (!row) return;
+      // Don't hijack clicks on links or buttons
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      var link = row.getAttribute('data-permalink');
+      if (link) window.location.href = link;
+    });
+  }
+
+  // ── Mobile: Swipe-to-close filter drawer ──────────────────────────
+  (function () {
+    if (!filterBar) return;
+    var startX = 0;
+    var currentX = 0;
+    var dragging = false;
+
+    filterBar.addEventListener('touchstart', function (e) {
+      if (window.innerWidth >= 768) return;
+      if (!filterBar.classList.contains('filter-bar--drawer-open')) return;
+      startX = e.touches[0].clientX;
+      dragging = true;
+    }, { passive: true });
+
+    filterBar.addEventListener('touchmove', function (e) {
+      if (!dragging) return;
+      currentX = e.touches[0].clientX;
+      var diff = currentX - startX;
+      if (diff > 0) {
+        filterBar.style.transform = 'translateX(' + diff + 'px)';
+      }
+    }, { passive: true });
+
+    filterBar.addEventListener('touchend', function () {
+      if (!dragging) return;
+      dragging = false;
+      var diff = currentX - startX;
+      if (diff > 80) {
+        closeFilterDrawer();
+      }
+      filterBar.style.transform = '';
+    }, { passive: true });
+  })();
 
   // ── Handle Resize: switch between mobile/desktop pagination ─────
   var resizeTimer;
