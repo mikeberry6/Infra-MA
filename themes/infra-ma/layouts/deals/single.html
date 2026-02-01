@@ -1,0 +1,74 @@
+{{ define "main" }}
+{{ $sectorColor := "#555" }}
+{{ with .Site.Data.sectors }}
+  {{ $sector := index . ($.Params.sector | default "") }}
+  {{ with $sector }}
+    {{ $sectorColor = .color }}
+  {{ end }}
+{{ end }}
+<section class="section">
+  <div class="container">
+    <a href="/deals/" class="back-link">&larr; All Deals</a>
+
+    <header class="deal-header">
+      <h1 class="deal-title">{{ .Title }}</h1>
+      <div class="deal-badges">
+        {{ with .Params.status }}<span class="badge badge-status badge-{{ . | urlize }}">{{ . }}</span>{{ end }}
+        {{ with .Params.value }}<span class="badge badge-value">{{ . }}</span>{{ end }}
+      </div>
+    </header>
+
+    <div class="deal-meta-grid">
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Buyer</span>
+        <span class="deal-meta-value">{{ with .Params.buyer }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Seller</span>
+        <span class="deal-meta-value">{{ with .Params.seller }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Target Asset</span>
+        <span class="deal-meta-value">{{ with .Params.target }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Sector</span>
+        <span class="deal-meta-value" style="color: {{ $sectorColor }};">{{ with .Params.sector }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Subsector</span>
+        <span class="deal-meta-value">{{ with .Params.subsector }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Geography</span>
+        <span class="deal-meta-value">{{ with .Params.geography }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Date Announced</span>
+        <span class="deal-meta-value">{{ .Date.Format "Jan 2, 2006" }}</span>
+      </div>
+      <div class="deal-meta-item">
+        <span class="deal-meta-label">Status</span>
+        <span class="deal-meta-value">{{ with .Params.status }}{{ . }}{{ else }}&mdash;{{ end }}</span>
+      </div>
+    </div>
+
+    {{ with .Params.sources }}
+    <div class="deal-sources">
+      <h2 class="deal-sources-title">Sources</h2>
+      <div class="deal-sources-list">
+        {{ range . }}
+        <a href="{{ . }}" class="pill pill-source" target="_blank" rel="noopener noreferrer">{{ . }}</a>
+        {{ end }}
+      </div>
+    </div>
+    {{ end }}
+
+    {{ if .Content }}
+    <div class="deal-content prose">
+      {{ .Content }}
+    </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

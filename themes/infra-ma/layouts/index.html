@@ -1,0 +1,82 @@
+{{ define "main" }}
+{{ $deals := where .Site.RegularPages "Section" "deals" }}
+<section class="hero">
+  <div class="container">
+    <h1 class="hero-title">Sponsor-Backed Infrastructure M&amp;A Intelligence</h1>
+    <p class="hero-subtitle">{{ with .Site.Params.description }}{{ . }}{{ else }}Tracking infrastructure deals across sectors and geographies{{ end }}</p>
+  </div>
+</section>
+
+<section class="stats-row">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value">{{ len $deals }}</span>
+        <span class="stat-label">Deals Tracked</span>
+      </div>
+      <div class="stat-card">
+        <a href="/deals/" class="stat-link">
+          <span class="stat-value">See Deals</span>
+          <span class="stat-label">Total Value</span>
+        </a>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ with .Site.Data.funds }}{{ len . }}{{ else }}0{{ end }}</span>
+        <span class="stat-label">Tracked Funds</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Latest Deals</h2>
+      <a href="/deals/" class="section-link">View all &rarr;</a>
+    </div>
+    {{ if $deals }}
+    <div class="deal-grid">
+      {{ range first 10 $deals.ByDate.Reverse }}
+        {{ partial "deal-card.html" . }}
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty-state">No deals yet.</p>
+    {{ end }}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Browse by Sector</h2>
+      <a href="/sectors/" class="section-link">View all &rarr;</a>
+    </div>
+    {{ with .Site.Data.sectors }}
+    <div class="sector-grid">
+      {{ range $name, $sector := . }}
+      <a href="/sectors/{{ $name | urlize }}/" class="sector-card" style="border-left: 3px solid {{ $sector.color }};">
+        <h3 class="sector-card-name">{{ $name }}</h3>
+        <span class="sector-card-count">{{ len $sector.subsectors }} subsectors</span>
+      </a>
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty-state">No sectors defined.</p>
+    {{ end }}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Tracked Funds</h2>
+      <a href="/funds/" class="section-link">View all &rarr;</a>
+    </div>
+    <div class="funds-summary">
+      <span class="badge badge-accent">{{ with .Site.Data.funds }}{{ len . }}{{ else }}0{{ end }} funds</span>
+      <a href="/funds/" class="btn btn-secondary">View all funds</a>
+    </div>
+  </div>
+</section>
+{{ end }}

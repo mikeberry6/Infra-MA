@@ -1,0 +1,39 @@
+baseURL = "https://mikeberry6.github.io/Infra-MA/"
+languageCode = "en-us"
+title = "Infra M&A Tracker"
+theme = "infra-ma"
+paginate = 50
+enableRobotsTXT = true
+
+[params]
+  description = "Tracking sponsor-backed infrastructure M&A activity"
+  tagline = "Sponsor-Backed Infrastructure M&A Intelligence"
+
+[taxonomies]
+  sector = "sectors"
+  subsector = "subsectors"
+  fund = "funds"
+  status = "statuses"
+  geography = "geographies"
+
+[outputs]
+  home = ["HTML", "JSON"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[menu]
+  [[menu.main]]
+    name = "Deals"
+    url = "/deals/"
+    weight = 1
+  [[menu.main]]
+    name = "Sectors"
+    url = "/sectors/"
+    weight = 2
+  [[menu.main]]
+    name = "Funds"
+    url = "/funds/"
+    weight = 3

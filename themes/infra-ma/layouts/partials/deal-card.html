@@ -1,0 +1,28 @@
+{{ $sectorColor := "#555" }}
+{{ with .Site.Data.sectors }}
+  {{ $sector := index . ($.Params.sector | default "") }}
+  {{ with $sector }}
+    {{ $sectorColor = .color }}
+  {{ end }}
+{{ end }}
+<a href="{{ .RelPermalink }}" class="deal-card" style="border-left: 3px solid {{ $sectorColor }};">
+  <h3 class="deal-card-title">{{ .Title }}</h3>
+  <div class="deal-card-parties">
+    {{ with .Params.buyer }}
+      <span class="deal-card-buyer">{{ . }}</span>
+      <span class="deal-card-arrow">&rarr;</span>
+    {{ end }}
+    {{ with .Params.target }}
+      <span class="deal-card-target">{{ . }}</span>
+    {{ end }}
+  </div>
+  <div class="deal-card-meta">
+    {{ with .Params.value }}<span class="pill pill-value">{{ . }}</span>{{ end }}
+    {{ with .Params.subsector }}<span class="pill pill-subsector" style="border-color: {{ $sectorColor }}; color: {{ $sectorColor }};">{{ . }}</span>{{ end }}
+    {{ with .Params.geography }}<span class="deal-card-geo">{{ . }}</span>{{ end }}
+  </div>
+  <div class="deal-card-footer">
+    <time class="deal-card-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+    {{ with .Params.status }}<span class="badge badge-status badge-{{ . | urlize }}">{{ . }}</span>{{ end }}
+  </div>
+</a>

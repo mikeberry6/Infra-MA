@@ -1,0 +1,56 @@
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">All Deals</h1>
+
+    <div id="filter-bar" class="filter-bar">
+      <input type="text" id="deal-search" class="filter-input" placeholder="Search deals...">
+      <select id="filter-sector" class="filter-select">
+        <option value="">All Sectors</option>
+        {{ range $name, $sector := .Site.Data.sectors }}
+        <option value="{{ $name }}">{{ $name }}</option>
+        {{ end }}
+      </select>
+      <select id="filter-subsector" class="filter-select">
+        <option value="">All Subsectors</option>
+      </select>
+      <select id="filter-geography" class="filter-select">
+        <option value="">All Geographies</option>
+      </select>
+      <select id="filter-fund" class="filter-select">
+        <option value="">All Funds</option>
+        {{ range .Site.Data.funds }}
+        <option value="{{ . }}">{{ . }}</option>
+        {{ end }}
+      </select>
+      <select id="filter-status" class="filter-select">
+        <option value="">All Statuses</option>
+      </select>
+      <button id="filter-reset" class="btn btn-secondary">Reset</button>
+    </div>
+
+    <p id="results-count" class="results-count">{{ len .Pages }} deals</p>
+
+    {{ $deals := .Pages.ByDate.Reverse }}
+    {{ if $deals }}
+    <div id="deals-list" class="deal-grid">
+      {{ range $deals }}
+      <div class="deal-card-wrapper"
+           data-sector="{{ .Params.sector | default "" }}"
+           data-subsector="{{ .Params.subsector | default "" }}"
+           data-geography="{{ .Params.geography | default "" }}"
+           data-fund="{{ .Params.buyer | default "" }}"
+           data-status="{{ .Params.status | default "" }}"
+           data-value="{{ .Params.value | default "" }}"
+           data-date="{{ .Date.Format "2006-01-02" }}"
+           data-search="{{ .Title | lower }} {{ .Params.buyer | default "" | lower }} {{ .Params.seller | default "" | lower }} {{ .Params.target | default "" | lower }} {{ .Params.geography | default "" | lower }}">
+        {{ partial "deal-card.html" . }}
+      </div>
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty-state">No deals yet.</p>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

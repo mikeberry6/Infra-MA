@@ -1,0 +1,30 @@
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">Sectors</h1>
+    {{ with .Site.Data.sectors }}
+    <div class="sector-grid">
+      {{ $deals := $.Site.RegularPages }}
+      {{ range $name, $sector := . }}
+      {{ $sectorDeals := where $deals "Params.sector" $name }}
+      <div class="sector-card" style="border-left: 3px solid {{ $sector.color }};">
+        <h2 class="sector-card-name">
+          <a href="/sectors/{{ $name | urlize }}/">{{ $name }}</a>
+        </h2>
+        <span class="sector-card-count">{{ len $sectorDeals }} deals</span>
+        {{ with $sector.subsectors }}
+        <ul class="sector-subsector-list">
+          {{ range . }}
+          <li class="sector-subsector-item">{{ . }}</li>
+          {{ end }}
+        </ul>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty-state">No sectors defined.</p>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
