@@ -1,6 +1,8 @@
 {{ define "main" }}
 {{ $deals := where .Site.RegularPages "Section" "deals" }}
 {{ $latestDeals := first 6 ($deals.ByDate.Reverse) }}
+{{ $fundCount := 0 }}{{ with .Site.Data.funds }}{{ $fundCount = len . }}{{ end }}
+{{ $sectorCount := 0 }}{{ with .Site.Data.sectors }}{{ $sectorCount = len . }}{{ end }}
 
 {{/* Hero */}}
 <section class="hero">
@@ -8,60 +10,64 @@
   <div class="container">
     <p class="hero-tagline">Infrastructure M&amp;A Intelligence</p>
     <h1 class="hero-title">Sponsor-Backed<br><span class="hero-title-accent">Deal Tracker</span></h1>
-    <p class="hero-subtitle">Monitoring {{ with .Site.Data.funds }}{{ len . }}{{ end }} infrastructure funds across {{ with .Site.Data.sectors }}{{ len . }}{{ end }} sectors for M&amp;A activity, updated weekly.</p>
+    <p class="hero-subtitle">Monitoring {{ $fundCount }} infrastructure funds across {{ $sectorCount }} sectors for M&amp;A activity, updated weekly.</p>
   </div>
 </section>
 
 {{/* Stats */}}
 <section class="section">
   <div class="container">
-    <div class="stats-grid stagger">
+    <div class="stats-grid reveal-stagger">
       <div class="stat-card">
-        <span class="stat-value">{{ len $deals }}</span>
+        <span class="stat-value" data-count="{{ len $deals }}">{{ len $deals }}</span>
         <span class="stat-label">Deals Tracked</span>
       </div>
       <div class="stat-card">
-        <span class="stat-value">{{ with .Site.Data.funds }}{{ len . }}{{ end }}</span>
+        <span class="stat-value" data-count="{{ $fundCount }}">{{ $fundCount }}</span>
         <span class="stat-label">Funds Monitored</span>
       </div>
       <div class="stat-card">
-        <span class="stat-value">{{ with .Site.Data.sectors }}{{ len . }}{{ end }}</span>
+        <span class="stat-value" data-count="{{ $sectorCount }}">{{ $sectorCount }}</span>
         <span class="stat-label">Sectors Covered</span>
       </div>
     </div>
   </div>
 </section>
 
+<hr class="section-divider">
+
 {{/* Latest Deals */}}
 <section class="section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header reveal">
       <h2 class="section-title">Latest Deals</h2>
       <a href="{{ "deals/" | relURL }}" class="section-link">View all deals &rarr;</a>
     </div>
     {{ if $latestDeals }}
-    <div class="deal-grid stagger">
+    <div class="deal-grid reveal-stagger">
       {{ range $latestDeals }}
       {{ partial "deal-card.html" . }}
       {{ end }}
     </div>
     {{ else }}
-    <div class="empty-state">
+    <div class="empty-state reveal">
       <p>No deals tracked yet. Check back after the next weekly update.</p>
     </div>
     {{ end }}
   </div>
 </section>
 
+<hr class="section-divider">
+
 {{/* Sectors */}}
 <section class="section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header reveal">
       <h2 class="section-title">Browse by Sector</h2>
       <a href="{{ "sectors/" | relURL }}" class="section-link">All sectors &rarr;</a>
     </div>
     {{ with .Site.Data.sectors }}
-    <div class="sector-grid stagger">
+    <div class="sector-grid reveal-stagger">
       {{ range $name, $sector := . }}
       {{ $sectorDeals := where ($.Site.RegularPages) "Params.sector" $name }}
       <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="sector-card" style="border-left-color: {{ $sector.color }}">
@@ -76,14 +82,16 @@
   </div>
 </section>
 
+<hr class="section-divider">
+
 {{/* Funds CTA */}}
 <section class="section">
-  <div class="container">
+  <div class="container reveal">
     <div class="section-header">
       <h2 class="section-title">Fund Coverage</h2>
       <a href="{{ "funds/" | relURL }}" class="section-link">View all funds &rarr;</a>
     </div>
-    <p class="text-secondary">Tracking M&amp;A activity across <strong>{{ with .Site.Data.funds }}{{ len . }}{{ end }} infrastructure funds</strong> including global infrastructure managers, pension funds, sovereign wealth funds, and private equity firms.</p>
+    <p class="text-secondary">Tracking M&amp;A activity across <strong>{{ $fundCount }} infrastructure funds</strong> including global infrastructure managers, pension funds, sovereign wealth funds, and private equity firms.</p>
   </div>
 </section>
 {{ end }}
