@@ -1,20 +1,6 @@
 {{ define "main" }}
-<article class="single">
-  <header class="article-header">
-    <h1>{{ .Title }}</h1>
-    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
-  </header>
-
-  <div class="article-content">
-    {{ .Content }}
-  </div>
-
-  {{ with .Params.tags }}
-  <div class="article-tags">
-    {{ range . }}
-    <a href="{{ "tags/" | relURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
-    {{ end }}
-  </div>
-  {{ end }}
-</article>
+<div class="container">
+  <h1>{{ .Title }}</h1>
+  <div class="deal__content">{{ .Content }}</div>
+</div>
 {{ end }}

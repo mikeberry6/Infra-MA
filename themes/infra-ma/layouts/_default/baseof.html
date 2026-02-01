@@ -5,22 +5,22 @@
 </head>
 <body>
   {{ partial "nav.html" . }}
-  <main id="main-content" class="{{ if not .IsHome }}container{{ end }}">
+  <main>
     {{ block "main" . }}{{ end }}
   </main>
-  {{ partial "footer.html" . }}
+
+  {{/* Command Bar */}}
+  <div class="cmdk-overlay" id="cmdk-overlay"></div>
+  <div class="cmdk" id="cmdk" role="dialog" aria-label="Command bar">
+    <div class="cmdk__input-wrap">
+      <svg class="cmdk__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="cmdk__input" id="cmdk-input" type="text" placeholder="Search deals..." autocomplete="off">
+      <kbd class="cmdk__esc">ESC</kbd>
+    </div>
+    <div class="cmdk__results" id="cmdk-results"></div>
+  </div>
+
   <script src="{{ "pagefind/pagefind-ui.js" | relURL }}"></script>
-  <script>
-    window.addEventListener('DOMContentLoaded', function () {
-      var el = document.getElementById('search');
-      if (el) {
-        new PagefindUI({
-          element: '#search',
-          showSubResults: false,
-          showImages: false
-        });
-      }
-    });
-  </script>
+  <script src="{{ "js/app.js" | relURL }}"></script>
 </body>
 </html>

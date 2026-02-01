@@ -1,50 +1,21 @@
 baseURL = 'https://mikeberry6.github.io/Infra-MA/'
 languageCode = 'en-us'
-title = 'Infrastructure M&A Tracker'
+title = 'Infra M&A'
 theme = 'infra-ma'
 
 [params]
-  description = 'Tracking infrastructure mergers and acquisitions transactions'
-  tagline = 'Tracking the flow of capital across global infrastructure'
-  author = 'Infra M&A Team'
-
-  [params.colors]
-    primary = '#0f172a'
-    accent = '#14b8a6'
-    surface1 = '#1e293b'
-    surface2 = '#334155'
-    surface3 = '#475569'
-
-  [params.sectorColors]
-    energy = '#f59e0b'
-    transport = '#3b82f6'
-    digital = '#8b5cf6'
-    water = '#06b6d4'
-    social = '#f43f5e'
+  description = 'Infrastructure mergers & acquisitions tracker'
+  tagline = 'Tracking capital flows across global infrastructure'
 
 [taxonomies]
   sector = 'sectors'
-  status = 'statuses'
-  tag = 'tags'
 
 [menu]
   [[menu.main]]
-    name = 'Home'
+    name = 'Briefing'
     url = '/'
     weight = 1
   [[menu.main]]
-    name = 'Deals'
+    name = 'Tracker'
     url = '/deals/'
     weight = 2
-  [[menu.main]]
-    name = 'Sectors'
-    url = '/sectors/'
-    weight = 3
-  [[menu.main]]
-    name = 'Analysis'
-    url = '/analysis/'
-    weight = 4
-  [[menu.main]]
-    name = 'About'
-    url = '/about/'
-    weight = 5

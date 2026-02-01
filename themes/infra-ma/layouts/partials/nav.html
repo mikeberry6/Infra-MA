@@ -1,61 +1,20 @@
-<a href="#main-content" class="skip-link">Skip to main content</a>
-<header class="site-nav-wrap" id="site-nav">
-  <div class="nav-inner container">
-    <a href="{{ "/" | relURL }}" class="nav-logo" aria-label="Home">
-      <span class="nav-logo-pulse" aria-hidden="true"></span>
-      <svg class="nav-logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
-      <span class="nav-logo-text">{{ .Site.Title }}</span>
-    </a>
-    <nav class="nav-links" id="nav-links" aria-label="Main navigation">
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="{{ "/" | relURL }}" class="nav__logo">Infra M&A</a>
+    <div class="nav__links">
       {{ range .Site.Menus.main }}
-      <a href="{{ .URL | relURL }}" class="nav-link{{ if $.IsMenuCurrent "main" . }} nav-link--active{{ end }}">{{ .Name }}</a>
+      <a href="{{ .URL | relURL }}" class="nav__link{{ if $.IsMenuCurrent "main" . }} nav__link--active{{ end }}">{{ .Name }}</a>
       {{ end }}
-    </nav>
-    <div class="nav-status" aria-hidden="true">
-      <span class="nav-status-dot"></span>
-      <span class="nav-status-text">LIVE</span>
     </div>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-    </button>
+    <div class="nav__right">
+      <button class="nav__cmd" id="cmdk-trigger" aria-label="Command bar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span class="nav__cmd-text">Search</span>
+        <kbd class="nav__kbd">&#8984;K</kbd>
+      </button>
+      <button class="nav__burger" id="nav-burger" aria-label="Menu">
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
-</header>
-<div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
-<script>
-(function(){
-  var btn=document.getElementById('nav-toggle');
-  var nav=document.getElementById('nav-links');
-  var overlay=document.getElementById('nav-overlay');
-
-  function openMenu(){
-    nav.classList.add('nav-links--open');
-    btn.classList.add('nav-toggle--open');
-    btn.setAttribute('aria-expanded','true');
-    overlay.classList.add('nav-overlay--visible');
-    document.body.classList.add('nav-open');
-  }
-
-  function closeMenu(){
-    nav.classList.remove('nav-links--open');
-    btn.classList.remove('nav-toggle--open');
-    btn.setAttribute('aria-expanded','false');
-    overlay.classList.remove('nav-overlay--visible');
-    document.body.classList.remove('nav-open');
-  }
-
-  btn.addEventListener('click',function(){
-    var isOpen=nav.classList.contains('nav-links--open');
-    if(isOpen){closeMenu();}else{openMenu();}
-  });
-
-  overlay.addEventListener('click',closeMenu);
-
-  // Close on link click (mobile)
-  var links=nav.querySelectorAll('.nav-link');
-  for(var i=0;i<links.length;i++){
-    links[i].addEventListener('click',closeMenu);
-  }
-})();
-</script>
+</nav>

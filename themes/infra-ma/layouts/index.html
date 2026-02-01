@@ -5,6 +5,7 @@
 {{ $closedCount := 0 }}
 {{ $announcedCount := 0 }}
 {{ $terminatedCount := 0 }}
+{{ $recentDeals := (where .Site.RegularPages "Section" "deals").ByDate.Reverse }}
 {{ range $deals }}
   {{ with .Params.value_usd_billions }}{{ $totalValue = add $totalValue . }}{{ end }}
   {{ if eq .Params.status "closed" }}{{ $closedCount = add $closedCount 1 }}{{ end }}
@@ -12,100 +13,130 @@
   {{ if eq .Params.status "terminated" }}{{ $terminatedCount = add $terminatedCount 1 }}{{ end }}
 {{ end }}
 
-{{/* ── Mission Control Hero ── */}}
-<section class="hero hero--ops">
-  <div class="hero__bg" aria-hidden="true"></div>
-  <div class="hero__content container">
-    <div class="hero__badge">
-      <span class="hero__badge-dot"></span>
-      MONITORING {{ $totalDeals }} DEALS
-    </div>
-    <h1 class="hero__title">{{ .Site.Title }}</h1>
-    <p class="hero__tagline">{{ .Site.Params.tagline }}</p>
+{{/* Ticker */}}
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    {{ range first 20 $recentDeals }}
+    <span class="ticker__item">
+      <span class="ticker__dot ticker__dot--{{ .Params.status | default "announced" }}"></span>
+      {{ .Title }}
+      {{ with .Params.deal_value }}<span class="ticker__val">{{ . }}</span>{{ end }}
+    </span>
+    {{ end }}
+    {{ range first 20 $recentDeals }}
+    <span class="ticker__item">
+      <span class="ticker__dot ticker__dot--{{ .Params.status | default "announced" }}"></span>
+      {{ .Title }}
+      {{ with .Params.deal_value }}<span class="ticker__val">{{ . }}</span>{{ end }}
+    </span>
+    {{ end }}
+  </div>
+</div>
 
-    {{/* Stats row — clean KPI cards */}}
-    <div class="hero__stats">
-      <div class="hero__stat">
-        <span class="hero__stat-value" id="stat-deals">{{ $totalDeals }}</span>
-        <span class="hero__stat-label">Deals Tracked</span>
+<div class="briefing">
+
+  {{/* Header */}}
+  <header class="briefing__header">
+    <h1 class="briefing__date">{{ now.Format "Monday, January 2" }}.</h1>
+    <p class="briefing__summary">
+      <span class="mono">{{ $announcedCount }}</span> announced &middot;
+      <span class="mono">{{ $closedCount }}</span> closed &middot;
+      <span class="mono">{{ $totalDeals }}</span> tracked
+    </p>
+  </header>
+
+  {{/* KPI Strip */}}
+  <div class="kpi">
+    <div class="kpi__card">
+      <span class="kpi__value">{{ $totalDeals }}</span>
+      <span class="kpi__label">Total Deals</span>
+    </div>
+    <div class="kpi__card">
+      <span class="kpi__value">${{ lang.FormatNumberCustom 0 $totalValue }}B</span>
+      <span class="kpi__label">Aggregate Value</span>
+    </div>
+    <div class="kpi__card">
+      <span class="kpi__value">${{ lang.FormatNumberCustom 1 (div $totalValue (float $totalDeals)) }}B</span>
+      <span class="kpi__label">Avg Deal Size</span>
+    </div>
+    <div class="kpi__card">
+      <div class="kpi__badges">
+        <span class="badge badge--announced">{{ $announcedCount }}</span>
+        <span class="badge badge--closed">{{ $closedCount }}</span>
+        <span class="badge badge--terminated">{{ $terminatedCount }}</span>
       </div>
-      <div class="hero__stat">
-        <span class="hero__stat-value">${{ lang.FormatNumberCustom 0 $totalValue }}B</span>
-        <span class="hero__stat-label">Total Value</span>
-      </div>
-      <div class="hero__stat hero__stat--status">
-        <div class="hero__stat-row">
-          <span class="hero__stat-status hero__stat-status--closed">{{ $closedCount }}</span>
-          <span class="hero__stat-status hero__stat-status--announced">{{ $announcedCount }}</span>
-          <span class="hero__stat-status hero__stat-status--terminated">{{ $terminatedCount }}</span>
+      <span class="kpi__label">Pipeline</span>
+    </div>
+  </div>
+
+  {{/* Search */}}
+  <div class="briefing__search">
+    <div id="search"></div>
+  </div>
+
+  {{/* Timeline */}}
+  <section class="timeline">
+    <div class="section-header">
+      <h2 class="section-title">Recent Activity</h2>
+      <a href="{{ "deals/" | relURL }}" class="section-link">View all →</a>
+    </div>
+    <div class="timeline__feed">
+      {{ range first 15 $recentDeals }}
+      {{ $status := .Params.status | default "announced" }}
+      <article class="tl-card" data-href="{{ .RelPermalink }}">
+        <div class="tl-card__rail">
+          <span class="tl-card__dot tl-card__dot--{{ $status }}"></span>
+          <span class="tl-card__line"></span>
         </div>
-        <span class="hero__stat-label">Closed / Announced / Terminated</span>
-      </div>
-      <div class="hero__stat">
-        {{ $geos := slice }}
-        {{ range $deals }}{{ with .Params.geography }}{{ $geos = $geos | append . }}{{ end }}{{ end }}
-        <span class="hero__stat-value">{{ len ($geos | uniq) }}</span>
-        <span class="hero__stat-label">Geographies</span>
-      </div>
-    </div>
-
-    {{/* Search */}}
-    <div class="hero__search">
-      <div id="search" class="search-box"></div>
-    </div>
-
-    {{/* Scroll indicator */}}
-    <div class="hero__scroll" aria-hidden="true">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-    </div>
-  </div>
-</section>
-
-{{/* ── Recent Activity Feed — horizontal rows ── */}}
-<section class="section container">
-  <div class="section__header">
-    <h2 class="section__title">Recent Activity</h2>
-    <a href="{{ "deals/" | relURL }}" class="section__link">View All Deals
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-    </a>
-  </div>
-  {{/* Column headers */}}
-  <div class="deal-row deal-row--header" aria-hidden="true">
-    <span class="deal-row__status"></span>
-    <div class="deal-row__main"><span>Deal</span></div>
-    <div class="deal-row__tags"><span>Sector / Region</span></div>
-    <div class="deal-row__value"><span>Value</span></div>
-    <span class="deal-row__date">Date</span>
-  </div>
-  <div class="deal-list-feed">
-    {{ range first 12 (where .Site.RegularPages "Section" "deals").ByDate.Reverse }}
-    {{ partial "deal-row.html" . }}
-    {{ end }}
-  </div>
-</section>
-
-{{/* ── Sector Status Board — clean list ── */}}
-<section class="section container">
-  <h2 class="section__title">Sector Status Board</h2>
-  <div class="sector-list">
-    {{ $sectorNames := dict "energy" "Energy" "transport" "Transport" "digital" "Digital" "water" "Water" "social" "Social" }}
-    {{ range $key, $name := $sectorNames }}
-    {{ $count := 0 }}
-    {{ $sectorValue := 0.0 }}
-    {{ range (where $.Site.RegularPages "Section" "deals") }}
-      {{ if eq .Params.sector $key }}
-        {{ $count = add $count 1 }}
-        {{ with .Params.value_usd_billions }}{{ $sectorValue = add $sectorValue . }}{{ end }}
+        <div class="tl-card__body">
+          <time class="tl-card__time" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+          <h3 class="tl-card__title">
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            {{ with .Params.deal_value }}<span class="tl-card__val">{{ . }}</span>{{ end }}
+          </h3>
+          <p class="tl-card__parties">
+            {{ with .Params.buyer }}{{ . }}{{ end }}{{ if and .Params.buyer .Params.seller }} → {{ end }}{{ with .Params.seller }}{{ . }}{{ end }}
+          </p>
+          <div class="tl-card__meta">
+            {{ with .Params.sector }}
+            <span class="pill pill--{{ urlize . }}">{{ . }}</span>
+            {{ end }}
+            {{ with .Params.geography }}
+            <span class="tl-card__geo">{{ . }}</span>
+            {{ end }}
+            <span class="status status--{{ $status }}">{{ $status }}</span>
+          </div>
+        </div>
+      </article>
       {{ end }}
-    {{ end }}
-    <a href="{{ "sectors/" | relURL }}{{ $key }}/" class="sector-row sector-row--{{ $key }}">
-      <span class="sector-row__indicator"></span>
-      <span class="sector-row__name">{{ $name }}</span>
-      <span class="sector-row__count">{{ $count }} deals</span>
-      <span class="sector-row__spacer"></span>
-      <span class="sector-row__value">${{ lang.FormatNumberCustom 1 $sectorValue }}B</span>
-    </a>
-    {{ end }}
-  </div>
-</section>
+    </div>
+  </section>
+
+  {{/* Sectors */}}
+  <section class="sectors">
+    <div class="section-header">
+      <h2 class="section-title">Sectors</h2>
+    </div>
+    <div class="sectors__grid">
+      {{ $sectorNames := dict "energy" "Energy" "transport" "Transport" "digital" "Digital" "water" "Water" "social" "Social" }}
+      {{ range $key, $name := $sectorNames }}
+      {{ $count := 0 }}
+      {{ $val := 0.0 }}
+      {{ range (where $.Site.RegularPages "Section" "deals") }}
+        {{ if eq .Params.sector $key }}
+          {{ $count = add $count 1 }}
+          {{ with .Params.value_usd_billions }}{{ $val = add $val . }}{{ end }}
+        {{ end }}
+      {{ end }}
+      <div class="sector-card">
+        <span class="sector-card__dot sector-card__dot--{{ $key }}"></span>
+        <span class="sector-card__name">{{ $name }}</span>
+        <span class="sector-card__count mono">{{ $count }}</span>
+        <span class="sector-card__val mono">${{ lang.FormatNumberCustom 1 $val }}B</span>
+      </div>
+      {{ end }}
+    </div>
+  </section>
+
+</div>
 {{ end }}
