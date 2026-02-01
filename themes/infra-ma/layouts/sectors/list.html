@@ -1,0 +1,32 @@
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">Sectors</h1>
+    <p class="page-subtitle">Infrastructure M&amp;A activity across {{ with .Site.Data.sectors }}{{ len . }}{{ end }} sectors</p>
+
+    {{ with .Site.Data.sectors }}
+    <div class="sector-grid">
+      {{ $allDeals := $.Site.RegularPages }}
+      {{ range $name, $sector := . }}
+      {{ $sectorDeals := where $allDeals "Params.sector" $name }}
+      <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="sector-card" style="border-left-color: {{ $sector.color }}">
+        <h2 class="sector-card-name">{{ $name }}</h2>
+        <span class="sector-card-count">{{ len $sectorDeals }} {{ if eq (len $sectorDeals) 1 }}deal{{ else }}deals{{ end }}</span>
+        {{ with $sector.subsectors }}
+        <ul class="sector-subsector-list">
+          {{ range . }}
+          <li class="sector-subsector-item">{{ . }}</li>
+          {{ end }}
+        </ul>
+        {{ end }}
+      </a>
+      {{ end }}
+    </div>
+    {{ else }}
+    <div class="empty-state">
+      <p>No sectors defined.</p>
+    </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

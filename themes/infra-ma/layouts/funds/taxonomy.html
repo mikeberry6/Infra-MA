@@ -1,0 +1,21 @@
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <a href="{{ "funds/" | relURL }}" class="back-link">&larr; All Funds</a>
+    <h1 class="page-title">{{ .Title }}</h1>
+
+    {{ $fundName := .Title }}
+    {{ $deals := where .Site.RegularPages "Params.buyer" $fundName }}
+    {{ if $deals }}
+    <p class="results-count">{{ len $deals }} deals</p>
+    <div class="deal-grid">
+      {{ range $deals.ByDate.Reverse }}
+        {{ partial "deal-card.html" . }}
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty-state">No deals found for this fund.</p>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

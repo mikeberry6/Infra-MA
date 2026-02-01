@@ -1,0 +1,84 @@
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">All Deals</h1>
+    <p class="page-subtitle">Browse and filter sponsor-backed infrastructure transactions</p>
+
+    {{/* Filter Bar */}}
+    <div class="filter-bar">
+      <div class="filter-bar-inner">
+        <input type="text" id="deal-search" class="filter-input" placeholder="Search deals...">
+        <div class="filter-controls">
+          <select id="filter-sector" class="filter-select">
+            <option value="">All Sectors</option>
+            {{ range $name, $sector := .Site.Data.sectors }}
+            <option value="{{ $name }}">{{ $name }}</option>
+            {{ end }}
+          </select>
+          <select id="filter-subsector" class="filter-select">
+            <option value="">All Subsectors</option>
+            {{ range $name, $sector := .Site.Data.sectors }}
+              {{ range $sector.subsectors }}
+              <option value="{{ . }}">{{ . }}</option>
+              {{ end }}
+            {{ end }}
+          </select>
+          <select id="filter-geography" class="filter-select">
+            <option value="">All Geographies</option>
+            {{ $geos := slice }}
+            {{ range (where .Site.RegularPages "Section" "deals") }}
+              {{ with .Params.geography }}
+                {{ if not (in $geos .) }}
+                  {{ $geos = $geos | append . }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+            {{ range sort $geos }}
+            <option value="{{ . }}">{{ . }}</option>
+            {{ end }}
+          </select>
+          <select id="filter-fund" class="filter-select">
+            <option value="">All Funds</option>
+            {{ range .Site.Data.funds }}
+            <option value="{{ . }}">{{ . }}</option>
+            {{ end }}
+          </select>
+          <select id="filter-status" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Announced">Announced</option>
+            <option value="Closed">Closed</option>
+            <option value="Terminated">Terminated</option>
+          </select>
+          <button id="filter-reset" class="filter-reset">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <p id="results-count" class="results-count">{{ len .Pages }} deals</p>
+
+    {{ $deals := .Pages.ByDate.Reverse }}
+    {{ if $deals }}
+    <div id="deals-list" class="deal-grid">
+      {{ range $deals }}
+      <div class="deal-card-wrapper"
+           data-sector="{{ .Params.sector | default "" }}"
+           data-subsector="{{ .Params.subsector | default "" }}"
+           data-geography="{{ .Params.geography | default "" }}"
+           data-fund="{{ .Params.buyer | default "" }}"
+           data-status="{{ .Params.status | default "" }}"
+           data-value="{{ .Params.value | default "" }}"
+           data-date="{{ .Date.Format "2006-01-02" }}"
+           data-title="{{ .Title }}"
+           data-search="{{ .Title | lower }} {{ .Params.buyer | default "" | lower }} {{ .Params.seller | default "" | lower }} {{ .Params.target | default "" | lower }} {{ .Params.geography | default "" | lower }}">
+        {{ partial "deal-card.html" . }}
+      </div>
+      {{ end }}
+    </div>
+    {{ else }}
+    <div class="empty-state">
+      <p>No deals yet. Check back after the next weekly update.</p>
+    </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

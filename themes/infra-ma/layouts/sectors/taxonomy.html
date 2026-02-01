@@ -1,0 +1,36 @@
+{{ define "main" }}
+{{ $sectorName := .Data.Singular | default .Title }}
+{{ $sectorColor := "#555" }}
+{{ $subsectors := slice }}
+{{ with .Site.Data.sectors }}
+  {{ $sector := index . $sectorName }}
+  {{ with $sector }}
+    {{ $sectorColor = .color }}
+    {{ $subsectors = .subsectors }}
+  {{ end }}
+{{ end }}
+<section class="section">
+  <div class="container">
+    <a href="{{ "sectors/" | relURL }}" class="back-link">All Sectors</a>
+    <h1 class="page-title" style="border-left: 4px solid {{ $sectorColor }}; padding-left: 1rem;">{{ .Title }}</h1>
+
+    {{ with $subsectors }}
+    <div class="chip-list">
+      {{ range . }}
+      <span class="chip" style="border-color: {{ $sectorColor }}; color: {{ $sectorColor }};">{{ . }}</span>
+      {{ end }}
+    </div>
+    {{ end }}
+
+    {{ if .Pages }}
+    <div class="deal-grid">
+      {{ range .Pages.ByDate.Reverse }}
+        {{ partial "deal-card.html" . }}
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty-state">No deals in this sector yet.</p>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

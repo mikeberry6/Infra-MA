@@ -1,0 +1,63 @@
+{
+  "Transportation & Logistics": {
+    "color": "#3b82f6",
+    "subsectors": [
+      "Aviation",
+      "Maritime & Ports",
+      "Roads & Surface Transport",
+      "Rail & Mass Transit",
+      "Logistics & Supply Chain"
+    ]
+  },
+  "Power & Energy Transition": {
+    "color": "#f59e0b",
+    "subsectors": [
+      "Renewable Power Generation",
+      "Conventional Power Generation",
+      "Energy Transition Infrastructure"
+    ]
+  },
+  "Midstream Energy": {
+    "color": "#ef4444",
+    "subsectors": [
+      "Pipeline Transport",
+      "Storage & Terminals",
+      "LNG Infrastructure",
+      "Carbon & Molecule Management"
+    ]
+  },
+  "Regulated Utilities": {
+    "color": "#06b6d4",
+    "subsectors": [
+      "Electric Networks",
+      "Gas Networks",
+      "Water Utilities",
+      "District Energy"
+    ]
+  },
+  "Environmental Services": {
+    "color": "#22c55e",
+    "subsectors": [
+      "Waste Management",
+      "Resource Recovery",
+      "Industrial Services"
+    ]
+  },
+  "Digital Infrastructure": {
+    "color": "#8b5cf6",
+    "subsectors": [
+      "Towers & Wireless",
+      "Fiber Networks",
+      "Data Centers",
+      "Global Connectivity"
+    ]
+  },
+  "Social Infrastructure": {
+    "color": "#f43f5e",
+    "subsectors": [
+      "Healthcare Infrastructure",
+      "Education Infrastructure",
+      "Civic & Government Facilities"
+    ]
+  }
+}
