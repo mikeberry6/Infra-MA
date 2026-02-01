@@ -1,7 +1,7 @@
 {{ define "main" }}
 <section class="section">
   <div class="container">
-    <a href="/funds/" class="back-link">&larr; All Funds</a>
+    <a href="{{ "funds/" | relURL }}" class="back-link">&larr; All Funds</a>
     <h1 class="page-title">{{ .Title }}</h1>
 
     {{ $fundName := .Title }}

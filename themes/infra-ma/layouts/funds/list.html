@@ -11,13 +11,19 @@
     {{ with .Site.Data.funds }}
     <div id="fund-grid" class="fund-grid">
       {{ range . }}
-      <a href="/funds/{{ . | urlize }}/" class="fund-card" data-name="{{ . | lower }}">
+      {{ $fundDeals := where ($.Site.RegularPages) "Params.buyer" . }}
+      <a href="{{ "funds/" | relURL }}{{ . | urlize }}/" class="fund-card" data-name="{{ . | lower }}">
         <span class="fund-card-name">{{ . }}</span>
+        {{ if $fundDeals }}
+        <span class="fund-card-count">{{ len $fundDeals }}</span>
+        {{ end }}
       </a>
       {{ end }}
     </div>
     {{ else }}
-    <p class="empty-state">No funds tracked yet.</p>
+    <div class="empty-state">
+      <p>No funds tracked yet.</p>
+    </div>
     {{ end }}
   </div>
 </section>

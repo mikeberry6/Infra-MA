@@ -24,9 +24,12 @@
 
   function initNavToggle() {
     const btn = document.querySelector('.nav-toggle');
-    const links = document.querySelector('.nav-links');
-    if (!btn || !links) return;
-    btn.addEventListener('click', () => links.classList.toggle('active'));
+    const menu = document.querySelector('.nav-mobile');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', () => {
+      const isOpen = menu.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', isOpen);
+    });
   }
 
   // ---------------------------------------------------------------------------
