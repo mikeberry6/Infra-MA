@@ -1,7 +1,0 @@
-name = "Infra M&A"
-license = "MIT"
-licenselink = "https://github.com/your-name/infra-ma/blob/main/LICENSE"
-description = "A Hugo theme for tracking infrastructure M&A transactions"
-
-[author]
-  name = "Infra M&A Team"
