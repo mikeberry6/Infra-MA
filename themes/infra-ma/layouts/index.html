@@ -15,7 +15,7 @@
 {{/* Stats */}}
 <section class="section">
   <div class="container">
-    <div class="stats-grid">
+    <div class="stats-grid stagger">
       <div class="stat-card">
         <span class="stat-value">{{ len $deals }}</span>
         <span class="stat-label">Deals Tracked</span>
@@ -40,7 +40,7 @@
       <a href="{{ "deals/" | relURL }}" class="section-link">View all deals &rarr;</a>
     </div>
     {{ if $latestDeals }}
-    <div class="deal-grid">
+    <div class="deal-grid stagger">
       {{ range $latestDeals }}
       {{ partial "deal-card.html" . }}
       {{ end }}
@@ -61,7 +61,7 @@
       <a href="{{ "sectors/" | relURL }}" class="section-link">All sectors &rarr;</a>
     </div>
     {{ with .Site.Data.sectors }}
-    <div class="sector-grid">
+    <div class="sector-grid stagger">
       {{ range $name, $sector := . }}
       {{ $sectorDeals := where ($.Site.RegularPages) "Params.sector" $name }}
       <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="sector-card" style="border-left-color: {{ $sector.color }}">

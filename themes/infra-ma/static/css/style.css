@@ -43,6 +43,7 @@
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
   /* Radii */
   --radius-sm: 6px;
@@ -489,6 +490,8 @@ p {
 }
 
 .stat-value {
+  display: block;
+  font-family: var(--font-mono);
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -498,6 +501,7 @@ p {
 }
 
 .stat-label {
+  display: block;
   font-size: 0.6875rem;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -567,22 +571,6 @@ p {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   color: inherit;
 }
-
-/* Sector left-border colors via data attribute or modifier classes */
-.deal-card[data-sector="transportation"],
-.deal-card.sector-transportation { border-left-color: var(--sector-transportation); }
-.deal-card[data-sector="power"],
-.deal-card.sector-power { border-left-color: var(--sector-power); }
-.deal-card[data-sector="midstream"],
-.deal-card.sector-midstream { border-left-color: var(--sector-midstream); }
-.deal-card[data-sector="utilities"],
-.deal-card.sector-utilities { border-left-color: var(--sector-utilities); }
-.deal-card[data-sector="environmental"],
-.deal-card.sector-environmental { border-left-color: var(--sector-environmental); }
-.deal-card[data-sector="digital"],
-.deal-card.sector-digital { border-left-color: var(--sector-digital); }
-.deal-card[data-sector="social"],
-.deal-card.sector-social { border-left-color: var(--sector-social); }
 
 .deal-card-title {
   font-size: 0.9375rem;
@@ -880,6 +868,7 @@ p {
 
 .filter-bar-inner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
@@ -983,6 +972,7 @@ p {
 .pill-value {
   color: var(--text-primary);
   background: var(--bg-surface-overlay);
+  font-family: var(--font-mono);
 }
 
 .pill-subsector {
@@ -994,15 +984,6 @@ p {
   color: var(--accent);
   background: var(--accent-muted);
 }
-
-/* Sector-colored pills using inline style or data attribute */
-.pill[data-sector="transportation"] { color: var(--sector-transportation); background: rgba(59, 130, 246, 0.12); }
-.pill[data-sector="power"] { color: var(--sector-power); background: rgba(245, 158, 11, 0.12); }
-.pill[data-sector="midstream"] { color: var(--sector-midstream); background: rgba(239, 68, 68, 0.12); }
-.pill[data-sector="utilities"] { color: var(--sector-utilities); background: rgba(6, 182, 212, 0.12); }
-.pill[data-sector="environmental"] { color: var(--sector-environmental); background: rgba(34, 197, 94, 0.12); }
-.pill[data-sector="digital"] { color: var(--sector-digital); background: rgba(139, 92, 246, 0.12); }
-.pill[data-sector="social"] { color: var(--sector-social); background: rgba(244, 63, 94, 0.12); }
 
 /* Badges (larger variant with borders) */
 .badge {
@@ -1024,6 +1005,7 @@ p {
   color: var(--text-primary);
   background: var(--bg-surface-overlay);
   border: 1px solid var(--border);
+  font-family: var(--font-mono);
 }
 
 .badge-announced {
@@ -1086,15 +1068,6 @@ p {
   color: inherit;
 }
 
-/* Sector-specific left borders */
-.sector-card[data-sector="transportation"] { border-left-color: var(--sector-transportation); }
-.sector-card[data-sector="power"] { border-left-color: var(--sector-power); }
-.sector-card[data-sector="midstream"] { border-left-color: var(--sector-midstream); }
-.sector-card[data-sector="utilities"] { border-left-color: var(--sector-utilities); }
-.sector-card[data-sector="environmental"] { border-left-color: var(--sector-environmental); }
-.sector-card[data-sector="digital"] { border-left-color: var(--sector-digital); }
-.sector-card[data-sector="social"] { border-left-color: var(--sector-social); }
-
 .sector-card-name {
   font-size: 1rem;
   font-weight: 600;
@@ -1103,6 +1076,7 @@ p {
 }
 
 .sector-card-count {
+  display: block;
   font-size: 0.75rem;
   color: var(--text-muted);
   font-weight: 500;
@@ -1350,9 +1324,18 @@ p {
 
 .footer-inner {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-1);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
 }
 
 .footer-copy {
@@ -1396,6 +1379,20 @@ p {
 .stagger > *:nth-child(10) { animation-delay: 360ms; }
 .stagger > *:nth-child(11) { animation-delay: 400ms; }
 .stagger > *:nth-child(12) { animation-delay: 440ms; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
 
 /* --------------------------------------------------------------------------
    18. Utility Classes
