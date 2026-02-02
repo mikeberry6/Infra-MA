@@ -13,16 +13,6 @@ status: "Announced"
 sources:
   - "https://example.com/kkr-digital-realty"
 summary: "KKR to acquire a portfolio of 12 European data centers from Digital Realty for $3.4 billion as part of Digital Realty's capital recycling program."
-funds:
-  - "KKR"
-sectors:
-  - "Digital Infrastructure"
-subsectors:
-  - "Data Centers"
-geographies:
-  - "Europe"
-statuses:
-  - "Announced"
 ---
 
 ## Transaction Overview

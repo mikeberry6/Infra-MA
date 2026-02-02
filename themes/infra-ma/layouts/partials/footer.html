@@ -1,6 +1,19 @@
 <footer class="footer">
   <div class="footer-inner container">
-    <p class="footer-copy">&copy; {{ now.Year }} {{ .Site.Title }}</p>
-    <p class="footer-copy text-muted">Tracking sponsor-backed infrastructure M&amp;A activity</p>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="{{ .Site.BaseURL }}" class="footer-logo">Infra<span class="nav-logo-accent">M&amp;A</span></a>
+        <p class="footer-tagline">Tracking sponsor-backed infrastructure M&amp;A activity across {{ with .Site.Data.funds }}{{ len . }}{{ end }} funds, updated weekly.</p>
+      </div>
+      <nav class="footer-nav">
+        {{ range .Site.Menus.main }}
+        <a href="{{ .URL | relURL }}">{{ .Name }}</a>
+        {{ end }}
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; {{ now.Year }} {{ .Site.Title }}</p>
+      <p class="footer-copy">Infrastructure M&amp;A Intelligence</p>
+    </div>
   </div>
 </footer>

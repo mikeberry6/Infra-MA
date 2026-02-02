@@ -1,9 +1,15 @@
 {{ define "main" }}
+<section class="page-hero">
+  <div class="container">
+    <a href="{{ "funds/" | relURL }}" class="back-link" style="color: var(--text-secondary)">&larr; All Funds</a>
+    <p class="page-hero-eyebrow">Fund</p>
+    <h1 class="page-hero-title"><span class="page-hero-title-accent">{{ .Title }}</span></h1>
+    <div class="page-hero-divider"></div>
+  </div>
+</section>
+
 <section class="section">
   <div class="container">
-    <a href="{{ "funds/" | relURL }}" class="back-link">&larr; All Funds</a>
-    <h1 class="page-title">{{ .Title }}</h1>
-
     {{ $fundName := .Title }}
     {{ $deals := where .Site.RegularPages "Params.buyer" $fundName }}
     {{ if $deals }}
@@ -14,7 +20,11 @@
       {{ end }}
     </div>
     {{ else }}
-    <p class="empty-state">No deals found for this fund.</p>
+    <div class="empty-state">
+      <div class="empty-state-icon">&#x1F3E6;</div>
+      <h3 class="empty-state-title">No deals found for this fund</h3>
+      <p>Check back after the next weekly update.</p>
+    </div>
     {{ end }}
   </div>
 </section>

@@ -13,17 +13,6 @@ status: "Announced"
 sources:
   - "https://example.com/brookfield-triton-announcement"
 summary: "Brookfield Asset Management to acquire Triton Power's 5.5 GW natural gas portfolio from Energy Capital Partners for $2.1 billion."
-funds:
-  - "Brookfield Asset Management"
-  - "Energy Capital Partners"
-sectors:
-  - "Power & Energy Transition"
-subsectors:
-  - "Conventional Power Generation"
-geographies:
-  - "United States"
-statuses:
-  - "Announced"
 ---
 
 ## Transaction Overview

@@ -1,0 +1,15 @@
+{{ define "main" }}
+<section class="page-hero">
+  <div class="container">
+    <p class="page-hero-eyebrow">Error 404</p>
+    <h1 class="page-hero-title">Page <span class="page-hero-title-accent">Not Found</span></h1>
+    <p class="page-hero-subtitle">The page you're looking for doesn't exist or has been moved.</p>
+    <div class="page-hero-divider"></div>
+  </div>
+</section>
+<section class="section">
+  <div class="container" style="text-align: center;">
+    <a href="{{ .Site.BaseURL }}" style="display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-6); background: var(--accent-muted); border: 1px solid rgba(20,184,166,0.15); border-radius: var(--radius-sm); color: var(--accent); font-weight: 500; font-size: 0.875rem; text-decoration: none;">Back to Home</a>
+  </div>
+</section>
+{{ end }}

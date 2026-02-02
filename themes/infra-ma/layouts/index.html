@@ -1,97 +1,100 @@
 {{ define "main" }}
 {{ $deals := where .Site.RegularPages "Section" "deals" }}
-{{ $latestDeals := first 6 ($deals.ByDate.Reverse) }}
+{{ $latestDeals := first 4 ($deals.ByDate.Reverse) }}
 {{ $fundCount := 0 }}{{ with .Site.Data.funds }}{{ $fundCount = len . }}{{ end }}
 {{ $sectorCount := 0 }}{{ with .Site.Data.sectors }}{{ $sectorCount = len . }}{{ end }}
 
-{{/* Hero */}}
-<section class="hero">
-  <div class="hero-glow"></div>
+{{/* Cinematic Hero */}}
+<section class="page-hero">
+  <div class="hero-cursor-glow"></div>
   <div class="container">
-    <p class="hero-tagline">Infrastructure M&amp;A Intelligence</p>
-    <h1 class="hero-title">Sponsor-Backed<br><span class="hero-title-accent">Deal Tracker</span></h1>
-    <p class="hero-subtitle">Monitoring {{ $fundCount }} infrastructure funds across {{ $sectorCount }} sectors for M&amp;A activity, updated weekly.</p>
+    <p class="page-hero-eyebrow">Infrastructure M&amp;A Intelligence</p>
+    <h1 class="page-hero-title">Sponsor-Backed<br><span class="page-hero-title-accent">Deal Tracker</span></h1>
+    <p class="page-hero-subtitle">Monitoring {{ $fundCount }} infrastructure funds across {{ $sectorCount }} sectors for M&amp;A activity, updated weekly.</p>
+    <div class="page-hero-divider"></div>
   </div>
 </section>
 
-{{/* Stats */}}
+{{/* Bento Grid Dashboard */}}
 <section class="section">
   <div class="container">
-    <div class="stats-grid reveal-stagger">
-      <div class="stat-card">
+    <div class="bento">
+
+      {{/* Stat tiles */}}
+      <div class="bento-tile bento-tile-stat">
         <span class="stat-value" data-count="{{ len $deals }}">{{ len $deals }}</span>
         <span class="stat-label">Deals Tracked</span>
       </div>
-      <div class="stat-card">
+      <div class="bento-tile bento-tile-stat">
         <span class="stat-value" data-count="{{ $fundCount }}">{{ $fundCount }}</span>
         <span class="stat-label">Funds Monitored</span>
       </div>
-      <div class="stat-card">
+      <div class="bento-tile bento-tile-stat">
         <span class="stat-value" data-count="{{ $sectorCount }}">{{ $sectorCount }}</span>
         <span class="stat-label">Sectors Covered</span>
       </div>
-    </div>
-  </div>
-</section>
 
-<hr class="section-divider">
-
-{{/* Latest Deals */}}
-<section class="section">
-  <div class="container">
-    <div class="section-header reveal">
-      <h2 class="section-title">Latest Deals</h2>
-      <a href="{{ "deals/" | relURL }}" class="section-link">View all deals &rarr;</a>
-    </div>
-    {{ if $latestDeals }}
-    <div class="deal-grid reveal-stagger">
-      {{ range $latestDeals }}
-      {{ partial "deal-card.html" . }}
-      {{ end }}
-    </div>
-    {{ else }}
-    <div class="empty-state reveal">
-      <p>No deals tracked yet. Check back after the next weekly update.</p>
-    </div>
-    {{ end }}
-  </div>
-</section>
-
-<hr class="section-divider">
-
-{{/* Sectors */}}
-<section class="section">
-  <div class="container">
-    <div class="section-header reveal">
-      <h2 class="section-title">Browse by Sector</h2>
-      <a href="{{ "sectors/" | relURL }}" class="section-link">All sectors &rarr;</a>
-    </div>
-    {{ with .Site.Data.sectors }}
-    <div class="sector-grid reveal-stagger">
-      {{ range $name, $sector := . }}
-      {{ $sectorDeals := where ($.Site.RegularPages) "Params.sector" $name }}
-      <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="sector-card" style="border-left-color: {{ $sector.color }}">
-        <div>
-          <h3 class="sector-card-name">{{ $name }}</h3>
-          <span class="sector-card-count">{{ len $sectorDeals }} {{ if eq (len $sectorDeals) 1 }}deal{{ else }}deals{{ end }} · {{ len $sector.subsectors }} subsectors</span>
+      {{/* Latest Deals — featured tile spanning 2 cols */}}
+      <div class="bento-tile bento-tile-deals bento-tile-featured">
+        <div class="bento-tile-header">
+          <h2 class="bento-tile-title">Latest Deals</h2>
+          <a href="{{ "deals/" | relURL }}" class="bento-tile-link">View all &rarr;</a>
         </div>
-      </a>
-      {{ end }}
-    </div>
-    {{ end }}
-  </div>
-</section>
+        {{ if $latestDeals }}
+        <div class="deal-grid deal-grid-compact">
+          {{ range $latestDeals }}
+          {{ partial "deal-card.html" . }}
+          {{ end }}
+        </div>
+        {{ else }}
+        <div class="empty-state">
+          <h3 class="empty-state-title">No deals tracked yet</h3>
+          <p>Check back after the next weekly update.</p>
+        </div>
+        {{ end }}
+      </div>
 
-<hr class="section-divider">
+      {{/* Sectors tile */}}
+      <div class="bento-tile bento-tile-sectors">
+        <div class="bento-tile-header">
+          <h2 class="bento-tile-title">Sectors</h2>
+          <a href="{{ "sectors/" | relURL }}" class="bento-tile-link">All sectors &rarr;</a>
+        </div>
+        {{ with .Site.Data.sectors }}
+        <div class="bento-sectors">
+          {{ range $name, $sector := . }}
+          {{ $sectorDeals := where ($.Site.RegularPages) "Params.sector" $name }}
+          <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="bento-sector-item">
+            <span class="bento-sector-dot" style="background: {{ $sector.color }}"></span>
+            <span class="bento-sector-name">{{ $name }}</span>
+            <span class="bento-sector-count">{{ len $sectorDeals }}</span>
+          </a>
+          {{ end }}
+        </div>
+        {{ end }}
+      </div>
 
-{{/* Funds CTA */}}
-<section class="section">
-  <div class="container reveal">
-    <div class="section-header">
-      <h2 class="section-title">Fund Coverage</h2>
-      <a href="{{ "funds/" | relURL }}" class="section-link">View all funds &rarr;</a>
+      {{/* Funds tile */}}
+      <div class="bento-tile bento-tile-funds">
+        <div class="bento-tile-header">
+          <h2 class="bento-tile-title">Fund Coverage</h2>
+          <a href="{{ "funds/" | relURL }}" class="bento-tile-link">All funds &rarr;</a>
+        </div>
+        {{ $allFunds := .Site.Data.funds }}
+        {{ with $allFunds }}
+        {{ $topFunds := first 8 . }}
+        {{ range $topFunds }}
+        {{ $fundDeals := where ($.Site.RegularPages) "Params.buyer" . }}
+        <a href="{{ "funds/" | relURL }}{{ . | urlize }}/" class="bento-fund-row">
+          <strong>{{ . }}</strong>
+          <span>{{ len $fundDeals }} deals</span>
+        </a>
+        {{ end }}
+        <a href="{{ "funds/" | relURL }}" class="bento-tile-link" style="margin-top: var(--space-3)">+ {{ sub (len $allFunds) 8 }} more funds</a>
+        {{ end }}
+      </div>
+
     </div>
-    <p class="text-secondary">Tracking M&amp;A activity across <strong>{{ $fundCount }} infrastructure funds</strong> including global infrastructure managers, pension funds, sovereign wealth funds, and private equity firms.</p>
   </div>
 </section>
 {{ end }}

@@ -12,6 +12,12 @@
         <a href="{{ .URL | relURL }}" class="nav-link{{ if $.IsMenuCurrent "main" . }} is-active{{ end }}{{ if $.HasMenuCurrent "main" . }} is-active{{ end }}">{{ .Name }}</a>
       </li>
       {{ end }}
+      <li class="nav-item">
+        <button class="nav-cmdk" id="cmdpal-trigger" aria-label="Search">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" stroke-width="2"/><line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <kbd>&#8984;K</kbd>
+        </button>
+      </li>
     </ul>
   </div>
   <div class="nav-mobile">

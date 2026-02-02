@@ -17,7 +17,8 @@ enableRobotsTXT = true
   geography = "geographies"
 
 [outputs]
-  home = ["HTML", "JSON"]
+  home = ["HTML", "JSON", "RSS"]
+  section = ["HTML", "RSS"]
 
 [markup]
   [markup.goldmark]

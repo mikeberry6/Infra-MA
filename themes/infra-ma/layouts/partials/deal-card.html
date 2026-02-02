@@ -6,7 +6,7 @@
     {{- $sectorColor = .color -}}
   {{- end -}}
 {{- end -}}
-<a href="{{ .RelPermalink }}" class="deal-card" style="border-left-color: {{ $sectorColor }}">
+<a href="{{ .RelPermalink }}" class="deal-card" style="--card-sector-color: {{ $sectorColor }}">
   <div class="deal-card-header">
     <h3 class="deal-card-title">{{ .Title }}</h3>
     <div class="deal-card-parties">
@@ -23,7 +23,7 @@
   </div>
   <div class="deal-card-meta">
     {{- with .Params.value -}}<span class="pill pill-value">{{ . }}</span>{{- end -}}
-    {{- with .Params.subsector -}}<span class="pill pill-subsector" style="color: {{ $sectorColor }}; border-color: {{ $sectorColor }}">{{ . }}</span>{{- end -}}
+    {{- with .Params.subsector -}}<span class="pill pill-subsector">{{ . }}</span>{{- end -}}
     {{- with .Params.geography -}}<span class="deal-card-geo">{{ . }}</span>{{- end -}}
   </div>
   <div class="deal-card-footer">
@@ -31,5 +31,6 @@
     {{- with .Params.status -}}
     <span class="badge badge-status badge-{{ . | urlize }}">{{ . }}</span>
     {{- end -}}
+    <span class="deal-card-go">&rarr;</span>
   </div>
 </a>
