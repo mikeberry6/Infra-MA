@@ -7,28 +7,43 @@
   {{- end -}}
 {{- end -}}
 
-<section class="section">
+<section class="deal-detail-hero" style="--deal-sector-color: {{ $sectorColor }}">
   <div class="container container-narrow">
-    <a href="{{ "deals/" | relURL }}" class="back-link">&larr; All Deals</a>
+    <a href="{{ "deals/" | relURL }}" class="back-link">All Deals</a>
 
     {{/* Header */}}
     <header class="deal-header">
       <h1 class="deal-title">{{ .Title }}</h1>
       <div class="deal-badges">
         {{ with .Params.status }}
-        <span class="badge badge-{{ . | urlize }}">{{ . }}</span>
+        <span class="badge badge-status badge-{{ . | urlize }}">{{ . }}</span>
         {{ end }}
         {{ with .Params.value }}
         <span class="badge badge-value">{{ . }}</span>
         {{ end }}
         {{ with .Params.sector }}
-        <span class="pill pill-subsector" style="color: {{ $sectorColor }}; border-color: {{ $sectorColor }}">{{ . }}</span>
+        <span class="pill pill-subsector" style="color: {{ $sectorColor }}">{{ . }}</span>
         {{ end }}
       </div>
     </header>
 
+    {{/* Deal Flow Visualization */}}
+    {{ if or .Params.buyer .Params.target }}
+    <div class="deal-flow reveal">
+      <div class="deal-flow-party">
+        <div class="deal-flow-label">{{ if .Params.buyer }}Buyer{{ else }}Party{{ end }}</div>
+        <div class="deal-flow-name">{{ with .Params.buyer }}{{ . }}{{ else }}&mdash;{{ end }}</div>
+      </div>
+      <div class="deal-flow-arrow">&rarr;</div>
+      <div class="deal-flow-party">
+        <div class="deal-flow-label">Target</div>
+        <div class="deal-flow-name">{{ with .Params.target }}{{ . }}{{ else }}&mdash;{{ end }}</div>
+      </div>
+    </div>
+    {{ end }}
+
     {{/* Metadata Grid */}}
-    <div class="deal-meta-grid">
+    <div class="deal-meta-grid reveal">
       <div class="deal-meta-item">
         <span class="deal-meta-label">Buyer</span>
         <span class="deal-meta-value">{{ with .Params.buyer }}{{ . }}{{ else }}&mdash;{{ end }}</span>
@@ -65,7 +80,7 @@
 
     {{/* Sources */}}
     {{ with .Params.sources }}
-    <div class="deal-sources">
+    <div class="deal-sources reveal">
       <h2 class="deal-sources-title">Sources</h2>
       <div class="deal-sources-list">
         {{ range . }}
@@ -77,7 +92,8 @@
 
     {{/* Content */}}
     {{ if .Content }}
-    <div class="deal-content prose">
+    <hr class="deal-content-divider">
+    <div class="deal-content prose reveal">
       {{ .Content }}
     </div>
     {{ end }}

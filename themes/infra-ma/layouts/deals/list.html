@@ -52,6 +52,9 @@
           <button id="filter-reset" class="filter-reset">Reset</button>
         </div>
       </div>
+      <div class="filter-bar-inner">
+        <div id="active-filters" class="active-filters"></div>
+      </div>
     </div>
 
     <p id="results-count" class="results-count">{{ len .Pages }} deals</p>
@@ -76,7 +79,9 @@
     </div>
     {{ else }}
     <div class="empty-state">
-      <p>No deals yet. Check back after the next weekly update.</p>
+      <div class="empty-state-icon">&#x1F50D;</div>
+      <h3 class="empty-state-title">No deals yet</h3>
+      <p>Check back after the next weekly update for new infrastructure M&amp;A activity.</p>
     </div>
     {{ end }}
   </div>

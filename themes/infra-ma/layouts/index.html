@@ -51,7 +51,9 @@
     </div>
     {{ else }}
     <div class="empty-state reveal">
-      <p>No deals tracked yet. Check back after the next weekly update.</p>
+      <div class="empty-state-icon">&#x1F4C8;</div>
+      <h3 class="empty-state-title">No deals tracked yet</h3>
+      <p>Check back after the next weekly update for new infrastructure M&amp;A activity.</p>
     </div>
     {{ end }}
   </div>
@@ -70,7 +72,7 @@
     <div class="sector-grid reveal-stagger">
       {{ range $name, $sector := . }}
       {{ $sectorDeals := where ($.Site.RegularPages) "Params.sector" $name }}
-      <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="sector-card" style="border-left-color: {{ $sector.color }}">
+      <a href="{{ "sectors/" | relURL }}{{ $name | urlize }}/" class="sector-card" style="--sector-color: {{ $sector.color }}">
         <div>
           <h3 class="sector-card-name">{{ $name }}</h3>
           <span class="sector-card-count">{{ len $sectorDeals }} {{ if eq (len $sectorDeals) 1 }}deal{{ else }}deals{{ end }} · {{ len $sector.subsectors }} subsectors</span>

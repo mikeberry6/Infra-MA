@@ -5,24 +5,24 @@
     <p class="page-subtitle">{{ with .Site.Data.funds }}{{ len . }}{{ else }}0{{ end }} infrastructure funds under coverage</p>
 
     <div class="fund-search-bar">
-      <input type="text" id="fund-search" class="filter-input" placeholder="Search funds...">
+      <input type="text" id="fund-search" placeholder="Search funds...">
     </div>
 
     {{ with .Site.Data.funds }}
-    <div id="fund-grid" class="fund-grid">
+    <div id="fund-grid" class="fund-grid reveal-stagger">
       {{ range . }}
       {{ $fundDeals := where ($.Site.RegularPages) "Params.buyer" . }}
       <a href="{{ "funds/" | relURL }}{{ . | urlize }}/" class="fund-card" data-name="{{ . | lower }}">
         <span class="fund-card-name">{{ . }}</span>
-        {{ if $fundDeals }}
-        <span class="fund-card-count">{{ len $fundDeals }}</span>
-        {{ end }}
+        <span class="fund-card-count{{ if not $fundDeals }} fund-card-no-deals{{ end }}">{{ if $fundDeals }}{{ len $fundDeals }}{{ else }}0{{ end }}</span>
       </a>
       {{ end }}
     </div>
     {{ else }}
     <div class="empty-state">
-      <p>No funds tracked yet.</p>
+      <div class="empty-state-icon">&#x1F3E6;</div>
+      <h3 class="empty-state-title">No funds tracked</h3>
+      <p>Fund directory will appear here once configured.</p>
     </div>
     {{ end }}
   </div>

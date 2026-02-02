@@ -79,10 +79,11 @@
       fund:      document.getElementById('filter-fund'),
       status:    document.getElementById('filter-status')
     };
-    const searchInput = document.getElementById('deal-search');
-    const resultsCount = document.getElementById('results-count');
-    const resetBtn     = document.getElementById('filter-reset');
-    const cards        = Array.from(list.querySelectorAll('[data-sector]'));
+    const searchInput    = document.getElementById('deal-search');
+    const resultsCount   = document.getElementById('results-count');
+    const resetBtn       = document.getElementById('filter-reset');
+    const activeFiltersEl = document.getElementById('active-filters');
+    const cards          = Array.from(list.querySelectorAll('[data-sector]'));
 
     // Cache original subsector options for cascade reset
     let allSubsectorOptions = [];
@@ -113,6 +114,45 @@
       filters.subsector.value = '';
     }
 
+    // --- Active filter pills -------------------------------------------------
+
+    function updateActiveFilterPills(vals, search) {
+      if (!activeFiltersEl) return;
+      activeFiltersEl.innerHTML = '';
+
+      const labels = {
+        sector: 'Sector',
+        subsector: 'Subsector',
+        geography: 'Geography',
+        fund: 'Fund',
+        status: 'Status'
+      };
+
+      Object.keys(vals).forEach(key => {
+        if (!vals[key]) return;
+        const pill = document.createElement('button');
+        pill.className = 'active-filter-pill';
+        pill.innerHTML = labels[key] + ': ' + vals[key] + ' <span class="active-filter-pill-x">&times;</span>';
+        pill.addEventListener('click', () => {
+          if (filters[key]) filters[key].value = '';
+          if (key === 'sector') updateSubsectors();
+          applyFilters();
+        });
+        activeFiltersEl.appendChild(pill);
+      });
+
+      if (search) {
+        const pill = document.createElement('button');
+        pill.className = 'active-filter-pill';
+        pill.innerHTML = 'Search: ' + search + ' <span class="active-filter-pill-x">&times;</span>';
+        pill.addEventListener('click', () => {
+          if (searchInput) searchInput.value = '';
+          applyFilters();
+        });
+        activeFiltersEl.appendChild(pill);
+      }
+    }
+
     // --- Core filter logic ---------------------------------------------------
 
     function applyFilters() {
@@ -121,6 +161,9 @@
         vals[key] = filters[key] ? filters[key].value : '';
       });
       const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      // Briefly flash results count
+      if (resultsCount) resultsCount.classList.add('results-count-updating');
 
       let visible = 0;
       cards.forEach(card => {
@@ -138,8 +181,12 @@
 
       if (resultsCount) {
         resultsCount.textContent = visible + ' deal' + (visible !== 1 ? 's' : '');
+        requestAnimationFrame(() => {
+          resultsCount.classList.remove('results-count-updating');
+        });
       }
 
+      updateActiveFilterPills(vals, search);
       syncFiltersToURL(vals, search);
     }
 
@@ -306,7 +353,7 @@
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -50px 0px' }
     );
 
     document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
@@ -342,7 +389,7 @@
   function animateCounter(el) {
     const target = parseInt(el.dataset.count, 10);
     if (isNaN(target)) return;
-    const duration = 1200;
+    const duration = 1400;
     const start = performance.now();
 
     function step(now) {
@@ -379,6 +426,26 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Card cursor-tracking glow
+  // ---------------------------------------------------------------------------
+
+  function initCardGlow() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if ('ontouchstart' in window) return; // Skip on touch devices
+
+    document.addEventListener('mousemove', (e) => {
+      const cards = document.querySelectorAll('.deal-card');
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', x + 'px');
+        card.style.setProperty('--mouse-y', y + 'px');
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------------------
   // Boot
   // ---------------------------------------------------------------------------
 
@@ -391,6 +458,7 @@
     initScrollReveal();
     initStatCounters();
     initCursorGlow();
+    initCardGlow();
   });
 
 })();
