@@ -115,7 +115,7 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 2;
   opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
@@ -321,7 +321,7 @@ p { color: var(--text-secondary); line-height: 1.7; }
 .nav-link.is-active { color: var(--text-primary); }
 
 /* Cmd+K trigger */
-.nav-search-trigger {
+.nav-cmdk {
   display: inline-flex; align-items: center; gap: var(--space-2);
   padding: 6px var(--space-3);
   font-size: 0.75rem; font-weight: 500;
@@ -332,11 +332,11 @@ p { color: var(--text-secondary); line-height: 1.7; }
   cursor: pointer;
   transition: border-color var(--transition), color var(--transition);
 }
-.nav-search-trigger:hover {
+.nav-cmdk:hover {
   border-color: var(--border-hover);
   color: var(--text-secondary);
 }
-.nav-search-trigger kbd {
+.nav-cmdk kbd {
   font-family: var(--font-sans);
   font-size: 0.625rem;
   color: var(--text-muted);
@@ -1785,4 +1785,102 @@ p { color: var(--text-secondary); line-height: 1.7; }
 @media (min-width: 768px) {
   .container { padding: 0 var(--space-8); }
   .container-narrow { padding: 0 var(--space-8); }
+}
+
+/* --------------------------------------------------------------------------
+   22. Missing class fixes
+   -------------------------------------------------------------------------- */
+
+/* #2: deal-card-wrapper — transparent wrapper for data attrs + filtering */
+.deal-card-wrapper {
+  display: contents;
+}
+
+/* #3: deal-grid-compact — 2-col compact grid inside bento tile */
+.deal-grid-compact {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+.deal-grid-compact .deal-card {
+  padding: var(--space-4);
+}
+.deal-grid-compact .deal-card-title {
+  font-size: 0.875rem;
+}
+@media (min-width: 640px) {
+  .deal-grid-compact { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* #4: results-count-updating — flash animation on filter change */
+.results-count-updating {
+  opacity: 0.5;
+  transition: opacity 100ms ease;
+}
+
+/* #5: page-list styles for _default/list.html */
+.page-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.page-list-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--transition), transform var(--transition-slow);
+}
+.page-list-item:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  color: inherit;
+}
+.page-list-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.page-list-item time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* #10: visually-hidden for accessible labels */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* #9: skip link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 10000;
+  padding: var(--space-3) var(--space-5);
+  background: var(--accent);
+  color: var(--bg-base);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  text-decoration: none;
+  transition: top var(--transition);
+}
+.skip-link:focus {
+  top: 0;
+  color: var(--bg-base);
 }

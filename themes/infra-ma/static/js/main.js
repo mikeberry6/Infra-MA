@@ -14,6 +14,70 @@
     };
   }
 
+  function throttle(fn, ms) {
+    let last = 0;
+    return function () {
+      const now = Date.now();
+      if (now - last >= ms) {
+        last = now;
+        fn.apply(this, arguments);
+      }
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Subsector cascade — loaded from search-data JSON if available, else fallback
+  // ---------------------------------------------------------------------------
+
+  let SUBSECTOR_MAP = {};
+
+  function loadSubsectorMap() {
+    try {
+      const el = document.getElementById('search-data');
+      if (!el) return;
+      const data = JSON.parse(el.textContent);
+      const sectorItems = data.filter(d => d.type === 'sector');
+      // Build from sectors — not available directly, use fallback
+    } catch (e) {
+      console.warn('[Infra-MA] Could not load subsector map from search data:', e);
+    }
+
+    // Fallback — built from filter options on the deals page
+    const sectorSelect = document.getElementById('filter-sector');
+    const subsectorSelect = document.getElementById('filter-subsector');
+    if (!sectorSelect || !subsectorSelect) return;
+
+    const allSubs = Array.from(subsectorSelect.options).map(o => o.value).filter(Boolean);
+    // We still need the mapping. Keep a static fallback for now.
+    SUBSECTOR_MAP = {
+      'Transportation & Logistics': [
+        'Aviation', 'Maritime & Ports', 'Roads & Surface Transport',
+        'Rail & Mass Transit', 'Logistics & Supply Chain'
+      ],
+      'Power & Energy Transition': [
+        'Renewable Power Generation', 'Conventional Power Generation',
+        'Energy Transition Infrastructure'
+      ],
+      'Midstream Energy': [
+        'Pipeline Transport', 'Storage & Terminals',
+        'LNG Infrastructure', 'Carbon & Molecule Management'
+      ],
+      'Regulated Utilities': [
+        'Electric Networks', 'Gas Networks', 'Water Utilities', 'District Energy'
+      ],
+      'Environmental Services': [
+        'Waste Management', 'Resource Recovery', 'Industrial Services'
+      ],
+      'Digital Infrastructure': [
+        'Towers & Wireless', 'Fiber Networks', 'Data Centers', 'Global Connectivity'
+      ],
+      'Social Infrastructure': [
+        'Healthcare Infrastructure', 'Education Infrastructure',
+        'Civic & Government Facilities'
+      ]
+    };
+  }
+
   // ---------------------------------------------------------------------------
   // Mobile nav toggle
   // ---------------------------------------------------------------------------
@@ -29,40 +93,11 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Subsector cascade mapping
-  // ---------------------------------------------------------------------------
-
-  const SUBSECTOR_MAP = {
-    'Transportation & Logistics': [
-      'Aviation', 'Maritime & Ports', 'Roads & Surface Transport',
-      'Rail & Mass Transit', 'Logistics & Supply Chain'
-    ],
-    'Power & Energy Transition': [
-      'Renewable Power Generation', 'Conventional Power Generation',
-      'Energy Transition Infrastructure'
-    ],
-    'Midstream Energy': [
-      'Pipeline Transport', 'Storage & Terminals',
-      'LNG Infrastructure', 'Carbon & Molecule Management'
-    ],
-    'Regulated Utilities': [
-      'Electric Networks', 'Gas Networks', 'Water Utilities', 'District Energy'
-    ],
-    'Environmental Services': [
-      'Waste Management', 'Resource Recovery', 'Industrial Services'
-    ],
-    'Digital Infrastructure': [
-      'Towers & Wireless', 'Fiber Networks', 'Data Centers', 'Global Connectivity'
-    ],
-    'Social Infrastructure': [
-      'Healthcare Infrastructure', 'Education Infrastructure',
-      'Civic & Government Facilities'
-    ]
-  };
-
-  // ---------------------------------------------------------------------------
   // Deal filtering (/deals/ page)
   // ---------------------------------------------------------------------------
+
+  // Track visible cards for timeline sync (#16)
+  let visibleCards = [];
 
   function initDealFiltering() {
     const list = document.getElementById('deals-list');
@@ -80,6 +115,7 @@
     const resetBtn       = document.getElementById('filter-reset');
     const activeFiltersEl = document.getElementById('active-filters');
     const cards          = Array.from(list.querySelectorAll('[data-sector]'));
+    visibleCards = cards;
 
     let allSubsectorOptions = [];
     if (filters.subsector) {
@@ -112,6 +148,7 @@
         if (!vals[key]) return;
         const pill = document.createElement('button');
         pill.className = 'active-filter-pill';
+        pill.setAttribute('type', 'button');
         pill.innerHTML = labels[key] + ': ' + vals[key] + ' <span class="active-filter-pill-x">&times;</span>';
         pill.addEventListener('click', () => {
           if (filters[key]) filters[key].value = '';
@@ -123,6 +160,7 @@
       if (search) {
         const pill = document.createElement('button');
         pill.className = 'active-filter-pill';
+        pill.setAttribute('type', 'button');
         pill.innerHTML = 'Search: ' + search + ' <span class="active-filter-pill-x">&times;</span>';
         pill.addEventListener('click', () => {
           if (searchInput) searchInput.value = '';
@@ -142,6 +180,7 @@
       if (resultsCount) resultsCount.classList.add('results-count-updating');
 
       let visible = 0;
+      const nowVisible = [];
       cards.forEach(card => {
         const match =
           (!vals.sector    || card.dataset.sector    === vals.sector) &&
@@ -151,8 +190,19 @@
           (!vals.status    || card.dataset.status    === vals.status) &&
           (!search         || (card.dataset.search || '').toLowerCase().includes(search));
         card.style.display = match ? '' : 'none';
-        if (match) visible++;
+        if (match) {
+          visible++;
+          nowVisible.push(card);
+        }
       });
+
+      // #16: Update visible cards for timeline
+      visibleCards = nowVisible;
+      // Rebuild timeline if currently in timeline view
+      const timelineView = document.getElementById('deals-timeline');
+      if (timelineView && timelineView.style.display !== 'none') {
+        buildTimeline();
+      }
 
       if (resultsCount) {
         resultsCount.textContent = visible + ' deal' + (visible !== 1 ? 's' : '');
@@ -220,7 +270,6 @@
     if (!gridView || !timelineView) return;
 
     const btns = toggle.querySelectorAll('.view-toggle-btn');
-    let timelineBuilt = false;
 
     btns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -231,10 +280,7 @@
         if (view === 'timeline') {
           gridView.style.display = 'none';
           timelineView.style.display = '';
-          if (!timelineBuilt) {
-            buildTimeline();
-            timelineBuilt = true;
-          }
+          buildTimeline();
         } else {
           gridView.style.display = '';
           timelineView.style.display = 'none';
@@ -243,12 +289,17 @@
     });
   }
 
+  // #16: buildTimeline now respects visibleCards filter state
   function buildTimeline() {
     const timeline = document.getElementById('timeline');
-    const cards = document.querySelectorAll('#deals-list [data-date]');
-    if (!timeline || !cards.length) return;
+    if (!timeline) return;
 
-    // Sort by date
+    const cards = visibleCards.length ? visibleCards : document.querySelectorAll('#deals-list [data-date]');
+    if (!cards.length) {
+      timeline.innerHTML = '<div class="empty-state" style="padding: var(--space-10)"><p>No deals match current filters.</p></div>';
+      return;
+    }
+
     const items = Array.from(cards).map(c => ({
       title: c.dataset.title || '',
       date: c.dataset.date || '',
@@ -268,7 +319,6 @@
       const bar = document.createElement('div');
       bar.className = 'timeline-bar';
       bar.style.background = item.color;
-      // Height based on whether value exists
       bar.style.height = item.value ? '80px' : '40px';
 
       const dot = document.createElement('div');
@@ -306,7 +356,10 @@
     try {
       const el = document.getElementById('search-data');
       if (el) searchData = JSON.parse(el.textContent);
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      // #20: Log JSON parse errors instead of silently swallowing
+      console.warn('[Infra-MA] Failed to parse search data:', e);
+    }
 
     let selectedIndex = -1;
 
@@ -322,6 +375,9 @@
       selectedIndex = -1;
     }
 
+    // #18: Debounce command palette search
+    const debouncedRender = debounce(function (val) { renderResults(val); }, 100);
+
     function renderResults(query) {
       const q = query.toLowerCase().trim();
       results.innerHTML = '';
@@ -332,7 +388,11 @@
       const groupIcons = { deal: '\u{1F4C4}', sector: '\u{1F3D7}', fund: '\u{1F3E6}' };
 
       const filtered = q
-        ? searchData.filter(item => item.title.toLowerCase().includes(q) || (item.buyer && item.buyer.toLowerCase().includes(q)) || (item.sector && item.sector.toLowerCase().includes(q)))
+        ? searchData.filter(item =>
+            (item.title && item.title.toLowerCase().includes(q)) ||
+            (item.buyer && item.buyer.toLowerCase().includes(q)) ||
+            (item.sector && item.sector.toLowerCase().includes(q))
+          )
         : searchData.slice(0, 15);
 
       filtered.forEach(item => {
@@ -351,7 +411,7 @@
 
         items.slice(0, 8).forEach(item => {
           const row = document.createElement('a');
-          row.href = item.url;
+          row.href = item.url || '#';
           row.className = 'cmdpal-item';
           row.dataset.index = totalItems++;
 
@@ -364,12 +424,12 @@
 
           const title = document.createElement('div');
           title.className = 'cmdpal-item-title';
-          title.textContent = item.title;
+          title.textContent = item.title || '';
 
           const sub = document.createElement('div');
           sub.className = 'cmdpal-item-sub';
           if (type === 'deal') {
-            sub.textContent = [item.buyer, item.sector, item.date].filter(Boolean).join(' · ');
+            sub.textContent = [item.buyer, item.sector, item.date].filter(Boolean).join(' \u00b7 ');
           } else if (type === 'sector') {
             sub.textContent = 'Sector';
           } else {
@@ -395,7 +455,7 @@
       if (!totalItems) {
         const empty = document.createElement('div');
         empty.className = 'cmdpal-empty';
-        empty.textContent = q ? 'No results for "' + q + '"' : 'Start typing to search...';
+        empty.textContent = q ? 'No results for \u201c' + q + '\u201d' : 'Start typing to search\u2026';
         results.appendChild(empty);
       }
     }
@@ -410,9 +470,7 @@
       }
     }
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-      // Cmd+K or Ctrl+K to open
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         if (overlay.classList.contains('is-open')) close(); else open();
@@ -446,15 +504,13 @@
       }
     });
 
-    // Click outside to close
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) close();
     });
 
-    // Search input
-    input.addEventListener('input', () => renderResults(input.value));
+    // #18: debounced input
+    input.addEventListener('input', () => debouncedRender(input.value));
 
-    // Trigger button
     if (trigger) trigger.addEventListener('click', open);
   }
 
@@ -565,20 +621,32 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Card cursor-tracking glow
+  // Card cursor-tracking glow (#17: throttled)
   // ---------------------------------------------------------------------------
 
   function initCardGlow() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if ('ontouchstart' in window) return;
 
-    document.addEventListener('mousemove', (e) => {
-      document.querySelectorAll('.deal-card, .bento-tile').forEach(card => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
-        card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
-      });
-    });
+    // #17: Cache card list and throttle mousemove
+    let cardCache = [];
+    let cacheTime = 0;
+
+    const handler = throttle((e) => {
+      const now = Date.now();
+      // Refresh cache every 2s
+      if (now - cacheTime > 2000) {
+        cardCache = Array.from(document.querySelectorAll('.deal-card, .bento-tile'));
+        cacheTime = now;
+      }
+      for (let i = 0; i < cardCache.length; i++) {
+        const rect = cardCache[i].getBoundingClientRect();
+        cardCache[i].style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+        cardCache[i].style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+      }
+    }, 16); // ~60fps
+
+    document.addEventListener('mousemove', handler);
   }
 
   // ---------------------------------------------------------------------------
@@ -586,6 +654,7 @@
   // ---------------------------------------------------------------------------
 
   document.addEventListener('DOMContentLoaded', () => {
+    loadSubsectorMap();
     initNavToggle();
     initDealFiltering();
     initViewToggle();

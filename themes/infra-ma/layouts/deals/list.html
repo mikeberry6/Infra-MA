@@ -20,16 +20,19 @@
     </div>
 
     {{/* Filter Bar */}}
-    <div class="filter-bar">
+    <form class="filter-bar" role="search" aria-label="Filter deals" onsubmit="return false;">
       <div class="filter-bar-inner">
+        <label for="deal-search" class="sr-only">Search deals</label>
         <input type="text" id="deal-search" class="filter-input" placeholder="Search deals...">
         <div class="filter-controls">
+          <label for="filter-sector" class="sr-only">Filter by sector</label>
           <select id="filter-sector" class="filter-select">
             <option value="">All Sectors</option>
             {{ range $name, $sector := .Site.Data.sectors }}
             <option value="{{ $name }}">{{ $name }}</option>
             {{ end }}
           </select>
+          <label for="filter-subsector" class="sr-only">Filter by subsector</label>
           <select id="filter-subsector" class="filter-select">
             <option value="">All Subsectors</option>
             {{ range $name, $sector := .Site.Data.sectors }}
@@ -38,6 +41,7 @@
               {{ end }}
             {{ end }}
           </select>
+          <label for="filter-geography" class="sr-only">Filter by geography</label>
           <select id="filter-geography" class="filter-select">
             <option value="">All Geographies</option>
             {{ $geos := slice }}
@@ -52,12 +56,14 @@
             <option value="{{ . }}">{{ . }}</option>
             {{ end }}
           </select>
+          <label for="filter-fund" class="sr-only">Filter by fund</label>
           <select id="filter-fund" class="filter-select">
             <option value="">All Funds</option>
             {{ range .Site.Data.funds }}
             <option value="{{ . }}">{{ . }}</option>
             {{ end }}
           </select>
+          <label for="filter-status" class="sr-only">Filter by status</label>
           <select id="filter-status" class="filter-select">
             <option value="">All Statuses</option>
             <option value="Announced">Announced</option>
@@ -70,7 +76,7 @@
       <div class="filter-bar-inner">
         <div id="active-filters" class="active-filters"></div>
       </div>
-    </div>
+    </form>
 
     <p id="results-count" class="results-count">{{ len .Pages }} deals</p>
 

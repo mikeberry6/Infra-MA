@@ -4,6 +4,7 @@
   {{ partial "head.html" . }}
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   {{/* Gradient Mesh Background */}}
   <div class="gradient-mesh" aria-hidden="true">
     <div class="gradient-mesh-blob"></div>
@@ -13,7 +14,7 @@
   </div>
 
   {{ partial "nav.html" . }}
-  <main class="main">
+  <main class="main" id="main-content">
     {{ block "main" . }}{{ end }}
   </main>
   {{ partial "footer.html" . }}
@@ -23,7 +24,7 @@
     <div class="cmdpal">
       <div class="cmdpal-input-wrap">
         <svg class="cmdpal-icon" viewBox="0 0 20 20" width="20" height="20"><circle cx="8.5" cy="8.5" r="5.75" fill="none" stroke="currentColor" stroke-width="2"/><line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input class="cmdpal-input" id="cmdpal-input" type="text" placeholder="Search deals, sectors, funds..." autocomplete="off" spellcheck="false">
+        <input class="cmdpal-input" id="cmdpal-input" type="text" placeholder="Search deals, sectors, funds..." autocomplete="off" spellcheck="false" aria-label="Search deals, sectors, funds">
       </div>
       <div class="cmdpal-results" id="cmdpal-results"></div>
       <div class="cmdpal-footer">
