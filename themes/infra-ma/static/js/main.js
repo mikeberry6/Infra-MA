@@ -621,32 +621,11 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Card cursor-tracking glow (#17: throttled)
+  // Card hover (CSS-only, no JS glow tracking needed)
   // ---------------------------------------------------------------------------
 
   function initCardGlow() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if ('ontouchstart' in window) return;
-
-    // #17: Cache card list and throttle mousemove
-    let cardCache = [];
-    let cacheTime = 0;
-
-    const handler = throttle((e) => {
-      const now = Date.now();
-      // Refresh cache every 2s
-      if (now - cacheTime > 2000) {
-        cardCache = Array.from(document.querySelectorAll('.deal-card, .bento-tile'));
-        cacheTime = now;
-      }
-      for (let i = 0; i < cardCache.length; i++) {
-        const rect = cardCache[i].getBoundingClientRect();
-        cardCache[i].style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
-        cardCache[i].style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
-      }
-    }, 16); // ~60fps
-
-    document.addEventListener('mousemove', handler);
+    // Hover states handled purely via CSS transitions
   }
 
   // ---------------------------------------------------------------------------
