@@ -1,9 +1,15 @@
 {{ define "main" }}
+<section class="page-hero">
+  <div class="container">
+    <p class="page-hero-eyebrow">Browse</p>
+    <h1 class="page-hero-title"><span class="page-hero-title-accent">Sectors</span></h1>
+    <p class="page-hero-subtitle">Infrastructure M&amp;A activity across {{ with .Site.Data.sectors }}{{ len . }}{{ end }} sectors</p>
+    <div class="page-hero-divider"></div>
+  </div>
+</section>
+
 <section class="section">
   <div class="container">
-    <h1 class="page-title">Sectors</h1>
-    <p class="page-subtitle">Infrastructure M&amp;A activity across {{ with .Site.Data.sectors }}{{ len . }}{{ end }} sectors</p>
-
     {{ with .Site.Data.sectors }}
     <div class="sector-grid reveal-stagger">
       {{ $allDeals := $.Site.RegularPages }}

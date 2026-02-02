@@ -9,27 +9,38 @@
     {{ $subsectors = .subsectors }}
   {{ end }}
 {{ end }}
-<section class="section">
-  <div class="container">
-    <a href="{{ "sectors/" | relURL }}" class="back-link">All Sectors</a>
-    <h1 class="page-title" style="border-left: 4px solid {{ $sectorColor }}; padding-left: 1rem;">{{ .Title }}</h1>
 
+<section class="page-hero" style="--env-color: {{ $sectorColor }}; --env-glow: {{ $sectorColor }}22">
+  <div class="container">
+    <a href="{{ "sectors/" | relURL }}" class="back-link" style="color: var(--text-secondary)">&larr; All Sectors</a>
+    <p class="page-hero-eyebrow">Sector</p>
+    <h1 class="page-hero-title"><span class="page-hero-title-accent">{{ .Title }}</span></h1>
     {{ with $subsectors }}
-    <div class="chip-list">
+    <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4);">
       {{ range . }}
       <span class="chip" style="border-color: {{ $sectorColor }}; color: {{ $sectorColor }};">{{ . }}</span>
       {{ end }}
     </div>
     {{ end }}
+    <div class="page-hero-divider"></div>
+  </div>
+</section>
 
+<section class="section">
+  <div class="container">
     {{ if .Pages }}
+    <p class="results-count">{{ len .Pages }} deals</p>
     <div class="deal-grid">
       {{ range .Pages.ByDate.Reverse }}
         {{ partial "deal-card.html" . }}
       {{ end }}
     </div>
     {{ else }}
-    <p class="empty-state">No deals in this sector yet.</p>
+    <div class="empty-state">
+      <div class="empty-state-icon">&#x1F3D7;</div>
+      <h3 class="empty-state-title">No deals in this sector yet</h3>
+      <p>Check back after the next weekly update.</p>
+    </div>
     {{ end }}
   </div>
 </section>

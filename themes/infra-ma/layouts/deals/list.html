@@ -1,8 +1,23 @@
 {{ define "main" }}
+
+{{/* Cinematic Header */}}
+<section class="page-hero">
+  <div class="container">
+    <p class="page-hero-eyebrow">Deal Database</p>
+    <h1 class="page-hero-title">All <span class="page-hero-title-accent">Deals</span></h1>
+    <p class="page-hero-subtitle">Browse and filter sponsor-backed infrastructure transactions</p>
+    <div class="page-hero-divider"></div>
+  </div>
+</section>
+
 <section class="section">
   <div class="container">
-    <h1 class="page-title">All Deals</h1>
-    <p class="page-subtitle">Browse and filter sponsor-backed infrastructure transactions</p>
+
+    {{/* View Toggle */}}
+    <div class="view-toggle" id="view-toggle">
+      <button class="view-toggle-btn is-active" data-view="grid">Grid</button>
+      <button class="view-toggle-btn" data-view="timeline">Timeline</button>
+    </div>
 
     {{/* Filter Bar */}}
     <div class="filter-bar">
@@ -61,8 +76,12 @@
 
     {{ $deals := .Pages.ByDate.Reverse }}
     {{ if $deals }}
+
+    {{/* Grid View */}}
     <div id="deals-list" class="deal-grid">
       {{ range $deals }}
+      {{ $sc := "#555" }}
+      {{ with $.Site.Data.sectors }}{{ $s := index . ($.Params.sector | default "") }}{{ with $s }}{{ $sc = .color }}{{ end }}{{ end }}
       <div class="deal-card-wrapper"
            data-sector="{{ .Params.sector | default "" }}"
            data-subsector="{{ .Params.subsector | default "" }}"
@@ -72,11 +91,19 @@
            data-value="{{ .Params.value | default "" }}"
            data-date="{{ .Date.Format "2006-01-02" }}"
            data-title="{{ .Title }}"
+           data-url="{{ .RelPermalink }}"
+           data-color="{{ $sc }}"
            data-search="{{ .Title | lower }} {{ .Params.buyer | default "" | lower }} {{ .Params.seller | default "" | lower }} {{ .Params.target | default "" | lower }} {{ .Params.geography | default "" | lower }}">
         {{ partial "deal-card.html" . }}
       </div>
       {{ end }}
     </div>
+
+    {{/* Timeline View (hidden by default, populated by JS) */}}
+    <div id="deals-timeline" class="timeline-container" style="display: none;">
+      <div class="timeline" id="timeline"></div>
+    </div>
+
     {{ else }}
     <div class="empty-state">
       <div class="empty-state-icon">&#x1F50D;</div>

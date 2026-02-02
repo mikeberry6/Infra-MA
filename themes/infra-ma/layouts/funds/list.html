@@ -1,9 +1,15 @@
 {{ define "main" }}
+<section class="page-hero">
+  <div class="container">
+    <p class="page-hero-eyebrow">Directory</p>
+    <h1 class="page-hero-title">Tracked <span class="page-hero-title-accent">Funds</span></h1>
+    <p class="page-hero-subtitle">{{ with .Site.Data.funds }}{{ len . }}{{ else }}0{{ end }} infrastructure funds under coverage</p>
+    <div class="page-hero-divider"></div>
+  </div>
+</section>
+
 <section class="section">
   <div class="container">
-    <h1 class="page-title">Tracked Funds</h1>
-    <p class="page-subtitle">{{ with .Site.Data.funds }}{{ len . }}{{ else }}0{{ end }} infrastructure funds under coverage</p>
-
     <div class="fund-search-bar">
       <input type="text" id="fund-search" placeholder="Search funds...">
     </div>
