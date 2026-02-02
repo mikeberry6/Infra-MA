@@ -10,7 +10,7 @@
   <div class="container">
     <p class="page-hero-eyebrow">Infrastructure M&amp;A Intelligence</p>
     <h1 class="page-hero-title">Sponsor-Backed<br><span class="page-hero-title-accent">Deal Tracker</span></h1>
-    <p class="page-hero-subtitle">Monitoring {{ $fundCount }} infrastructure funds across {{ $sectorCount }} sectors for M&amp;A activity, updated weekly.</p>
+    <p class="page-hero-subtitle">Tracking {{ $fundCount }} infrastructure funds across {{ $sectorCount }} sectors. Updated weekly.</p>
     <div class="page-hero-divider"></div>
   </div>
 </section>
@@ -90,7 +90,7 @@
           <span>{{ len $fundDeals }} deals</span>
         </a>
         {{ end }}
-        <a href="{{ "funds/" | relURL }}" class="bento-tile-link" style="margin-top: var(--space-3)">+ {{ sub (len $allFunds) 8 }} more funds</a>
+        <a href="{{ "funds/" | relURL }}" class="bento-tile-link" style="margin-top: var(--space-2); display: block">+ {{ sub (len $allFunds) 8 }} more</a>
         {{ end }}
       </div>
 
